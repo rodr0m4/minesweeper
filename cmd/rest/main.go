@@ -1,17 +1,27 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"minesweeper/internal/platform/provide"
+	"minesweeper/internal/platform/rest"
 )
 
 func main() {
 	if err := run(); err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 }
 
 func run() error {
-	fmt.Println("Hello world!")
-	return nil
+	game := provide.Game()
+
+	server := &rest.Server{
+		Engine:           provide.GinEngine(),
+		Game:             game,
+		StartGameHandler: provide.StartGameHandler(game),
+	}
+
+	server.RegisterRoutes()
+
+	return server.Engine.Run()
 }

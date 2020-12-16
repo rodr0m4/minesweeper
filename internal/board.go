@@ -10,6 +10,7 @@ type Board struct {
 	matrix  [][]*Tile
 	rows    int
 	columns int
+	bombs   int
 }
 
 type Position struct {
@@ -17,17 +18,18 @@ type Position struct {
 	Column int
 }
 
-func NewBoard(rows, columns, bombs int) *Board {
+func NewBoard(rows, columns, bombs int) Board {
 	matrix := newMatrix(rows, columns)
 
 	for _, position := range bombPositions(rows, columns, bombs) {
 		matrix[position.Row][position.Column].hasBomb = true
 	}
 
-	return &Board{
+	return Board{
 		matrix:  matrix,
 		rows:    rows,
 		columns: columns,
+		bombs:   bombs,
 	}
 }
 
@@ -37,6 +39,10 @@ func (b Board) HasRows(i int) bool {
 
 func (b Board) HasColumns(i int) bool {
 	return b.columns == i
+}
+
+func (b Board) HasBombs(i int) bool {
+	return b.bombs == i
 }
 
 func (b Board) Area() int {
