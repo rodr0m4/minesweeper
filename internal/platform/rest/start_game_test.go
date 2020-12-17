@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"minesweeper/internal"
+	"minesweeper/internal/operation"
 	"minesweeper/internal/platform/game"
 	"net/http"
 	"net/http/httptest"
@@ -56,12 +57,7 @@ func Test_Should_Fail_When_Game_Cant_Start(t *testing.T) {
 		}
 		r.POST("/games", handler.StartGame)
 
-		body, _ := json.Marshal(gin.H{
-			"rows":    2,
-			"columns": 2,
-			"bombs":   1,
-		})
-		req := httptest.NewRequest(http.MethodPost, "/games", bytes.NewBuffer(body))
+		req := newRequest()
 
 		r.ServeHTTP(rr, req)
 
@@ -69,90 +65,91 @@ func Test_Should_Fail_When_Game_Cant_Start(t *testing.T) {
 	}
 }
 
-func Test_Should_Fail_When_Game_Board_Fails(t *testing.T) {
-	type Case struct {
-		game         game.Game
-		expectedCode int
-	}
+func Test_Should_Fail_When_ShowGame_Fails(t *testing.T) {
+	g := game.Fake{}
+	err := errors.New("oh no")
 
-	cases := []Case{
-		{
-			game:         gameWhoseBoardFailsWith(internal.NewInvalidOperation("oh no")),
-			expectedCode: http.StatusBadRequest,
-		},
-		{
-			game:         gameWhoseBoardFailsWith(errors.New("oh no")),
-			expectedCode: http.StatusInternalServerError,
-		},
-	}
+	starter := gameStarterMock(func(_ game.Game, _, _, _ int) error {
+		return nil
+	})
+	shower := gameShowerMock(func(actual game.Game) (operation.ShowedGame, error) {
+		assert.Equal(t, g, actual)
 
-	for _, tt := range cases {
-		rr := httptest.NewRecorder()
-		_, r := gin.CreateTestContext(rr)
-
-		handler := StartGameHandler{
-			Game:        tt.game,
-			GameStarter: gameStarterThatFailsWith(nil),
-		}
-		r.POST("/games", handler.StartGame)
-
-		body, _ := json.Marshal(gin.H{
-			"rows":    2,
-			"columns": 2,
-			"bombs":   1,
-		})
-		req := httptest.NewRequest(http.MethodPost, "/games", bytes.NewBuffer(body))
-
-		r.ServeHTTP(rr, req)
-
-		assert.Equal(t, tt.expectedCode, rr.Code)
-	}
-}
-
-func Test_Should_Draw_Board_And_Return_Created(t *testing.T) {
-	rr := httptest.NewRecorder()
-	_, r := gin.CreateTestContext(rr)
-
-	board := internal.NewBoard(2, 2, 1)
-	g := game.Fake{
-		BoardFunc: func() (internal.Board, error) {
-			return board, nil
-		},
-	}
+		return operation.ShowedGame{}, err
+	})
 
 	handler := StartGameHandler{
 		Game:        g,
-		GameStarter: gameStarterThatFailsWith(nil),
-		BoardDrawer: boardDrawerMock(func(actual internal.Board, revealEverything bool) []string {
-			assert.Equal(t, board, actual)
-			return []string{"Hello", "World"}
-		}),
+		GameStarter: starter,
+		GameShower:  shower,
 	}
+
+	rr := httptest.NewRecorder()
+	_, r := gin.CreateTestContext(rr)
 
 	r.POST("/games", handler.StartGame)
 
+	r.ServeHTTP(rr, newRequest())
+
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
+}
+
+func Test_Should_Return_Showed_Game_And_Created_When_Passes(t *testing.T) {
+	g := game.Fake{}
+	lines := []string{"Hello", "World"}
+
+	starter := gameStarterMock(func(_ game.Game, _, _, _ int) error {
+		return nil
+	})
+	shower := gameShowerMock(func(actual game.Game) (operation.ShowedGame, error) {
+		assert.Equal(t, g, actual)
+
+		return operation.ShowedGame{
+			Lines: lines,
+		}, nil
+	})
+
+	handler := StartGameHandler{
+		Game:        g,
+		GameStarter: starter,
+		GameShower:  shower,
+	}
+
+	rr := httptest.NewRecorder()
+	_, r := gin.CreateTestContext(rr)
+
+	r.POST("/games", handler.StartGame)
+
+	r.ServeHTTP(rr, newRequest())
+
+	assert.Equal(t, http.StatusCreated, rr.Code)
+
+	var response operation.ShowedGame
+	_ = json.Unmarshal(rr.Body.Bytes(), &response)
+	assert.Equal(t, lines, response.Lines)
+}
+
+// Helpers
+
+func newRequest() *http.Request {
 	body, _ := json.Marshal(gin.H{
 		"rows":    2,
 		"columns": 2,
 		"bombs":   1,
 	})
-	req := httptest.NewRequest(http.MethodPost, "/games", bytes.NewBuffer(body))
 
-	r.ServeHTTP(rr, req)
+	buf := bytes.NewBuffer(body)
+	req := httptest.NewRequest(http.MethodPost, "/games", buf)
 
-	assert.Equal(t, http.StatusCreated, rr.Code)
-	var response startGameResponse
-	_ = json.Unmarshal(rr.Body.Bytes(), &response)
-
-	assert.Equal(t, []string{"Hello", "World"}, response.Lines)
+	return req
 }
 
 // Mocks
 
-type boardDrawerMock func(board internal.Board, revealEverything bool) []string
+type gameShowerMock func(game.Game) (operation.ShowedGame, error)
 
-func (b boardDrawerMock) DrawBoardIntoStringArray(board internal.Board, revealEverything bool) []string {
-	return b(board, revealEverything)
+func (g gameShowerMock) ShowGame(game game.Game) (operation.ShowedGame, error) {
+	return g(game)
 }
 
 type gameStarterMock func(game game.Game, rows, columns, bombs int) error
@@ -164,13 +161,5 @@ func (g gameStarterMock) StartGame(game game.Game, rows, columns, bombs int) err
 func gameStarterThatFailsWith(err error) gameStarterMock {
 	return func(game game.Game, rows, columns, bombs int) error {
 		return err
-	}
-}
-
-func gameWhoseBoardFailsWith(err error) game.Game {
-	return game.Fake{
-		BoardFunc: func() (internal.Board, error) {
-			return internal.Board{}, err
-		},
 	}
 }

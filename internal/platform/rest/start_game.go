@@ -3,6 +3,7 @@ package rest
 import (
 	"errors"
 	"minesweeper/internal"
+	"minesweeper/internal/operation"
 	"minesweeper/internal/platform/game"
 	"net/http"
 
@@ -15,10 +16,6 @@ type startGameRequest struct {
 	Bombs   int `json:"bombs"`
 }
 
-type startGameResponse struct {
-	Lines []string `json:"lines"`
-}
-
 type JSONError struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
@@ -28,14 +25,14 @@ type GameStarter interface {
 	StartGame(game game.Game, rows, columns, bombs int) error
 }
 
-type BoardDrawer interface {
-	DrawBoardIntoStringArray(board internal.Board, revealEverything bool) []string
+type GameShower interface {
+	ShowGame(game game.Game) (operation.ShowedGame, error)
 }
 
 type StartGameHandler struct {
 	Game        game.Game
 	GameStarter GameStarter
-	BoardDrawer BoardDrawer
+	GameShower  GameShower
 }
 
 func (s StartGameHandler) StartGame(ctx *gin.Context) {
@@ -50,18 +47,14 @@ func (s StartGameHandler) StartGame(ctx *gin.Context) {
 		return
 	}
 
-	var response startGameResponse
-
-	board, err := s.Game.Board()
+	sg, err := s.GameShower.ShowGame(s.Game)
 
 	if err != nil {
 		abortWithError(ctx, err)
 		return
 	}
 
-	response.Lines = s.BoardDrawer.DrawBoardIntoStringArray(board, true)
-
-	ctx.JSON(http.StatusCreated, response)
+	ctx.JSON(http.StatusCreated, sg)
 }
 
 func errorToStatusCode(err error) int {
