@@ -16,7 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Test_Should_Fail_When_Passed_Invalid_JSON(t *testing.T) {
+func Test_StartGame_Should_Fail_When_Passed_Invalid_JSON(t *testing.T) {
 	handler := StartGameHandler{}
 
 	rr := httptest.NewRecorder()
