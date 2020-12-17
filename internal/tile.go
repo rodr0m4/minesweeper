@@ -12,40 +12,38 @@ type Tile struct {
 	state   TileState
 }
 
-type NewTileOption func(*Tile)
+type TileOption func(*Tile)
 
-func WithBomb() NewTileOption {
+func WithBomb() TileOption {
 	return func(tile *Tile) {
 		tile.hasBomb = true
 	}
 }
 
-func ThatIsFlagged() NewTileOption {
+func Flag() TileOption {
 	return WithState(FlaggedTile{})
 }
 
-func ThatIsMarked(adjacent int) NewTileOption {
+func Mark(adjacent int) TileOption {
 	return WithState(HiddenTile{Adjacent: adjacent})
 }
 
-func ThatIsRevealed() NewTileOption {
+func Reveal() TileOption {
 	return WithState(RevealedTile{})
 }
 
-func WithState(state TileState) NewTileOption {
+func WithState(state TileState) TileOption {
 	return func(tile *Tile) {
 		tile.state = state
 	}
 }
 
-func NewTile(opts ...NewTileOption) *Tile {
+func NewTile(opts ...TileOption) *Tile {
 	tile := &Tile{
 		state: HiddenTile{},
 	}
 
-	for _, opt := range opts {
-		opt(tile)
-	}
+	tile.Modify(opts...)
 
 	return tile
 }
@@ -56,6 +54,12 @@ func (t *Tile) HasBomb() bool {
 
 func (t *Tile) State() TileState {
 	return t.state
+}
+
+func (t *Tile) Modify(opts ...TileOption) {
+	for _, opt := range opts {
+		opt(t)
+	}
 }
 
 func (t *Tile) Tap() (result TapResult, err error) {

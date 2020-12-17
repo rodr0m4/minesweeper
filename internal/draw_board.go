@@ -17,7 +17,7 @@ func DrawBoardIntoStringArray(board Board, revealEverything bool) []string {
 		}
 
 		sb.WriteRune('|')
-		sb.WriteRune(bombnessToRune(tile))
+		sb.WriteRune(bombToRun(tile))
 		sb.WriteRune(stateToRune(tile))
 	})
 
@@ -39,7 +39,7 @@ func stateToRune(tile *Tile) rune {
 	panic(fmt.Errorf("unrecheable code: invalid tile state %d", tile.State()))
 }
 
-func bombnessToRune(tile *Tile) rune {
+func bombToRun(tile *Tile) rune {
 	if tile.HasBomb() {
 		return 'X'
 	} else {
