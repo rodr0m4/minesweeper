@@ -57,7 +57,7 @@ func Test_Should_Fail_When_Game_Cant_Start(t *testing.T) {
 		}
 		r.POST("/games", handler.StartGame)
 
-		req := newRequest()
+		req := newStartGameRequest()
 
 		r.ServeHTTP(rr, req)
 
@@ -89,7 +89,7 @@ func Test_Should_Fail_When_ShowGame_Fails(t *testing.T) {
 
 	r.POST("/games", handler.StartGame)
 
-	r.ServeHTTP(rr, newRequest())
+	r.ServeHTTP(rr, newStartGameRequest())
 
 	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 }
@@ -120,7 +120,7 @@ func Test_Should_Return_Showed_Game_And_Created_When_Passes(t *testing.T) {
 
 	r.POST("/games", handler.StartGame)
 
-	r.ServeHTTP(rr, newRequest())
+	r.ServeHTTP(rr, newStartGameRequest())
 
 	assert.Equal(t, http.StatusCreated, rr.Code)
 
@@ -131,7 +131,7 @@ func Test_Should_Return_Showed_Game_And_Created_When_Passes(t *testing.T) {
 
 // Helpers
 
-func newRequest() *http.Request {
+func newStartGameRequest() *http.Request {
 	body, _ := json.Marshal(gin.H{
 		"rows":    2,
 		"columns": 2,

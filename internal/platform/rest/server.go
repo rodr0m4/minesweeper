@@ -10,4 +10,5 @@ type Server struct {
 	Engine           *gin.Engine
 	Game             game.Game
 	StartGameHandler *StartGameHandler
+	ShowGameHandler  *ShowGameHandler
 }

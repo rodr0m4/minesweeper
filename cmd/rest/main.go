@@ -14,11 +14,13 @@ func main() {
 
 func run() error {
 	game := provide.Game()
+	showGame := provide.ShowGame()
 
 	server := &rest.Server{
 		Engine:           provide.GinEngine(),
 		Game:             game,
-		StartGameHandler: provide.StartGameHandler(game),
+		StartGameHandler: provide.StartGameHandler(game, showGame),
+		ShowGameHandler:  provide.ShowGameHandler(game, showGame),
 	}
 
 	server.RegisterRoutes()

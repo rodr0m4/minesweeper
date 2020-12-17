@@ -22,10 +22,17 @@ func ShowGame() operation.ShowGame {
 	}
 }
 
-func StartGameHandler(game game.Game) *rest.StartGameHandler {
+func StartGameHandler(game game.Game, showGame operation.ShowGame) *rest.StartGameHandler {
 	return &rest.StartGameHandler{
 		Game:        game,
 		GameStarter: operation.StartGame{},
-		GameShower:  ShowGame(),
+		GameShower:  showGame,
+	}
+}
+
+func ShowGameHandler(game game.Game, showGame operation.ShowGame) *rest.ShowGameHandler {
+	return &rest.ShowGameHandler{
+		Game:       game,
+		GameShower: showGame,
 	}
 }
