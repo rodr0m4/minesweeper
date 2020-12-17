@@ -27,7 +27,7 @@ func DrawBoardIntoStringArray(board Board, revealEverything bool) []string {
 }
 
 func stateToRune(tile *Tile) rune {
-	switch tile.State() {
+	switch tile.State().(type) {
 	case HiddenTile:
 		return 'H'
 	case RevealedTile:

@@ -17,25 +17,25 @@ func Test_Draw_Board_Revealing(t *testing.T) {
 		{
 			name: "on a small board with one bomb",
 			given: [][]*Tile{
-				{&Tile{hasBomb: true}, &Tile{}},
-				{&Tile{}, &Tile{}},
+				{NewTile(WithBomb()), NewTile()},
+				{NewTile(), NewTile()},
 			},
 			expect: []string{"|XH|OH|", "|OH|OH|"},
 		},
 		{
 			name: "on a bigger board with multiple bombs",
 			given: [][]*Tile{
-				{&Tile{}, &Tile{}, &Tile{hasBomb: true}, &Tile{}},
-				{&Tile{hasBomb: true}, &Tile{}, &Tile{hasBomb: true}, &Tile{hasBomb: true}},
-				{&Tile{hasBomb: true}, &Tile{}, &Tile{}, &Tile{hasBomb: true}},
+				{NewTile(), NewTile(), NewTile(WithBomb()), NewTile()},
+				{NewTile(WithBomb()), NewTile(), NewTile(WithBomb()), NewTile(WithBomb())},
+				{NewTile(WithBomb()), NewTile(), NewTile(), NewTile(WithBomb())},
 			},
 			expect: []string{"|OH|OH|XH|OH|", "|XH|OH|XH|XH|", "|XH|OH|OH|XH|"},
 		},
 		{
 			name: "with flagged and revealed tiles",
 			given: [][]*Tile{
-				{&Tile{hasBomb: true, state: FlaggedTile}, &Tile{}},
-				{&Tile{hasBomb: true}, &Tile{state: RevealedTile}},
+				{NewTile(WithBomb(), ThatIsFlagged()), NewTile()},
+				{NewTile(WithBomb()), NewTile(ThatIsRevealed())},
 			},
 			expect: []string{"|XF|OH|", "|XH|OR|"},
 		},

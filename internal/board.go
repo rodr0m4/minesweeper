@@ -82,7 +82,7 @@ func newMatrix(rows int, columns int) [][]*Tile {
 		matrix[i] = make([]*Tile, columns)
 
 		for j := 0; j < columns; j++ {
-			matrix[i][j] = &Tile{}
+			matrix[i][j] = NewTile()
 		}
 	}
 	return matrix

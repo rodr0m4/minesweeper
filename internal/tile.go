@@ -12,6 +12,44 @@ type Tile struct {
 	state   TileState
 }
 
+type NewTileOption func(*Tile)
+
+func WithBomb() NewTileOption {
+	return func(tile *Tile) {
+		tile.hasBomb = true
+	}
+}
+
+func ThatIsFlagged() NewTileOption {
+	return WithState(FlaggedTile{})
+}
+
+func ThatIsMarked(adjacent int) NewTileOption {
+	return WithState(HiddenTile{Adjacent: adjacent})
+}
+
+func ThatIsRevealed() NewTileOption {
+	return WithState(RevealedTile{})
+}
+
+func WithState(state TileState) NewTileOption {
+	return func(tile *Tile) {
+		tile.state = state
+	}
+}
+
+func NewTile(opts ...NewTileOption) *Tile {
+	tile := &Tile{
+		state: HiddenTile{},
+	}
+
+	for _, opt := range opts {
+		opt(tile)
+	}
+
+	return tile
+}
+
 func (t *Tile) HasBomb() bool {
 	return t.hasBomb
 }
@@ -21,17 +59,16 @@ func (t *Tile) State() TileState {
 }
 
 func (t *Tile) Tap() (result TapResult, err error) {
-	if t.state == RevealedTile {
+	switch t.state.(type) {
+	case RevealedTile:
 		err = ErrCantTapOnRevealedTile
 		return
-	}
-
-	if t.state == FlaggedTile {
+	case FlaggedTile:
 		err = ErrCantTapOnFlaggedTile
 		return
 	}
 
-	t.state = RevealedTile
+	t.state = RevealedTile{}
 
 	if t.hasBomb {
 		result = ExplosionResult
@@ -39,14 +76,6 @@ func (t *Tile) Tap() (result TapResult, err error) {
 
 	return
 }
-
-type TileState int
-
-const (
-	HiddenTile TileState = iota
-	RevealedTile
-	FlaggedTile
-)
 
 type TapResult int
 

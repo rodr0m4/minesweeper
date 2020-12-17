@@ -63,7 +63,7 @@ func Test_Find_On_Empty_Board(t *testing.T) {
 	tile := board.Find(Position{}) // We find the tile on the top-left
 
 	assert.False(t, tile.HasBomb(), "this board does not have bombs")
-	assert.Equal(t, HiddenTile, tile.State(), "every tile in a new board should be hidden")
+	assert.Equal(t, HiddenTile{}, tile.State(), "every tile in a new board should be hidden")
 }
 
 func Test_Find_On_A_Board_With_Bombs(t *testing.T) {
