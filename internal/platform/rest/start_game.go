@@ -28,9 +28,14 @@ type GameStarter interface {
 	StartGame(game game.Game, rows, columns, bombs int) error
 }
 
+type BoardDrawer interface {
+	DrawBoardIntoStringArray(board internal.Board, revealEverything bool) []string
+}
+
 type StartGameHandler struct {
 	Game        game.Game
 	GameStarter GameStarter
+	BoardDrawer BoardDrawer
 }
 
 func (s StartGameHandler) StartGame(ctx *gin.Context) {
@@ -54,7 +59,7 @@ func (s StartGameHandler) StartGame(ctx *gin.Context) {
 		return
 	}
 
-	response.Lines = internal.DrawBoardIntoStringArray(board, true)
+	response.Lines = s.BoardDrawer.DrawBoardIntoStringArray(board, true)
 
 	ctx.JSON(http.StatusCreated, response)
 }
@@ -67,6 +72,7 @@ func errorToStatusCode(err error) int {
 	return http.StatusInternalServerError
 }
 
+// TODO: Refactor these into a middleware
 func abortWithError(ctx *gin.Context, err error) {
 	abortWithErrorAndStatus(ctx, errorToStatusCode(err), err)
 }

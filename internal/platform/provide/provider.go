@@ -20,5 +20,6 @@ func StartGameHandler(game game.Game) *rest.StartGameHandler {
 	return &rest.StartGameHandler{
 		Game:        game,
 		GameStarter: operation.StartGame{},
+		BoardDrawer: operation.BoardDrawer{},
 	}
 }
