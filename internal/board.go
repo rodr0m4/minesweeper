@@ -2,7 +2,6 @@ package internal
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 )
 
@@ -57,19 +56,7 @@ func (b Board) Find(position Position) *Tile {
 	row := position.Row
 	column := position.Column
 
-	if b.isOutOfBounds(row, column) {
-		log.Panic(b.outOfBoundsError(row, column))
-	}
-
 	return b.matrix[row][column]
-}
-
-func (b Board) FindScalar(rows int, columns int) *Tile {
-	if b.rows <= rows || b.columns <= columns {
-		panic("invalid access")
-	}
-
-	return b.matrix[rows][columns]
 }
 
 func (b Board) Traverse(f func(*Tile, Position)) {
