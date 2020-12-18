@@ -5,8 +5,10 @@ import (
 	"math/rand"
 )
 
+type Matrix = [][]*Tile
+
 type Board struct {
-	matrix  [][]*Tile
+	matrix  Matrix
 	rows    int
 	columns int
 	bombs   int
@@ -15,6 +17,29 @@ type Board struct {
 type Position struct {
 	Row    int
 	Column int
+}
+
+// This constructor does not use randomness, for testing purposes
+func NewBoardFromInitializedMatrix(matrix Matrix) Board {
+	var rows, columns, bombs int
+
+	rows = len(matrix)
+	if rows != 0 {
+		columns = len(matrix[0])
+	}
+
+	traverse(rows, columns, func(position Position) {
+		if matrix[position.Row][position.Column].hasBomb {
+			bombs++
+		}
+	})
+
+	return Board{
+		matrix:  matrix,
+		rows:    rows,
+		columns: columns,
+		bombs:   bombs,
+	}
 }
 
 func NewBoard(rows, columns, bombs int) Board {
@@ -76,8 +101,8 @@ func (b Board) Position(row, column int) (Position, error) {
 
 // Private members
 
-func newMatrix(rows int, columns int) [][]*Tile {
-	matrix := make([][]*Tile, rows)
+func newMatrix(rows int, columns int) Matrix {
+	matrix := make(Matrix, rows)
 	for i := 0; i < rows; i++ {
 		matrix[i] = make([]*Tile, columns)
 
@@ -90,6 +115,7 @@ func newMatrix(rows int, columns int) [][]*Tile {
 
 // TODO: Optimize
 // Naive algorithm
+// TODO: There is a bug with one bomb
 func bombPositions(rows, columns, bombs int) []Position {
 	var positions []Position
 

@@ -7,8 +7,9 @@ import (
 
 // An InMemory representation of a Game, used for local debugging
 type InMemory struct {
-	mutex sync.Mutex
-	board *internal.Board
+	mutex      sync.Mutex
+	board      *internal.Board
+	isFinished bool
 }
 
 func NewInMemory(board *internal.Board) *InMemory {
@@ -22,7 +23,7 @@ func (i *InMemory) IsStarted() bool {
 }
 
 func (i *InMemory) Board() (internal.Board, error) {
-	if !i.IsStarted() {
+	if !CanPlay(i) {
 		return internal.Board{}, internal.NewInvalidOperation("game not yet started")
 	}
 
@@ -39,6 +40,19 @@ func (i *InMemory) Sync(board internal.Board) error {
 		i.board = &board
 	})
 	return nil
+}
+
+func (i *InMemory) Finish() {
+	i.execute(func() {
+		i.isFinished = true
+	})
+}
+
+func (i *InMemory) IsFinished() (result bool) {
+	i.execute(func() {
+		result = i.isFinished
+	})
+	return
 }
 
 func (i *InMemory) execute(f func()) {

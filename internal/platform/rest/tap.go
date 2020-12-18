@@ -21,18 +21,4 @@ func (h TapHandler) Tap(ctx *gin.Context) {
 	if err := ctx.BindJSON(&request); err != nil {
 		return
 	}
-
-	board, err := h.Game.Board()
-
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
-
-	_, err = board.Position(request.Row, request.Column)
-
-	if err != nil {
-		_ = ctx.Error(err)
-		return
-	}
 }

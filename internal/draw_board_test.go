@@ -9,14 +9,14 @@ import (
 func Test_Draw_Board_Revealing(t *testing.T) {
 	type Case struct {
 		name   string
-		given  [][]*Tile
+		given  Matrix
 		expect []string
 	}
 
 	cases := []Case{
 		{
 			name: "on a small board with one bomb",
-			given: [][]*Tile{
+			given: Matrix{
 				{NewTile(WithBomb()), NewTile()},
 				{NewTile(), NewTile()},
 			},
@@ -24,7 +24,7 @@ func Test_Draw_Board_Revealing(t *testing.T) {
 		},
 		{
 			name: "on a bigger board with multiple bombs",
-			given: [][]*Tile{
+			given: Matrix{
 				{NewTile(), NewTile(), NewTile(WithBomb()), NewTile()},
 				{NewTile(WithBomb()), NewTile(), NewTile(WithBomb()), NewTile(WithBomb())},
 				{NewTile(WithBomb()), NewTile(), NewTile(), NewTile(WithBomb())},
@@ -33,7 +33,7 @@ func Test_Draw_Board_Revealing(t *testing.T) {
 		},
 		{
 			name: "with flagged and revealed tiles",
-			given: [][]*Tile{
+			given: Matrix{
 				{NewTile(WithBomb(), Flag()), NewTile()},
 				{NewTile(WithBomb()), NewTile(Reveal())},
 			},

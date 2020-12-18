@@ -10,6 +10,12 @@ type Game interface {
 	// is required)
 	IsStarted() bool
 
+	// Finish marks this game as finished
+	Finish()
+
+	// IsFinished queries if this game finished
+	IsFinished() bool
+
 	// Board gets a reference to the current Board, makes no guarantee about
 	// internal state of the Game (domain "leaks", maybe fix eventually)
 	Board() (internal.Board, error)
@@ -17,4 +23,8 @@ type Game interface {
 	// Sync this Game's Board with the given one.
 	// This is a mutating, blocking operation
 	Sync(internal.Board) error
+}
+
+func CanPlay(game Game) bool {
+	return game.IsStarted() && !game.IsFinished()
 }

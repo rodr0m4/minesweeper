@@ -87,3 +87,7 @@ const (
 	NothingResult TapResult = iota
 	ExplosionResult
 )
+
+func (tr TapResult) String() string {
+	return []string{"Nothing", "Explosion"}[tr]
+}
