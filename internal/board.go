@@ -49,12 +49,7 @@ func NewBoard(rows, columns, bombs int) Board {
 		matrix[position.Row][position.Column].hasBomb = true
 	}
 
-	return Board{
-		matrix:  matrix,
-		rows:    rows,
-		columns: columns,
-		bombs:   bombs,
-	}
+	return NewBoardFromInitializedMatrix(matrix)
 }
 
 func (b Board) HasRows(i int) bool {

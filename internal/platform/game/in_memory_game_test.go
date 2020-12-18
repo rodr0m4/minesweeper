@@ -8,7 +8,7 @@ import (
 )
 
 func Test_InMemory_Board(t *testing.T) {
-	expect := internal.NewBoard(10, 10, 1)
+	expect := internal.NewBoardFromInitializedMatrix(internal.Matrix{})
 	game := NewInMemory(&expect)
 
 	actual, err := game.Board()
@@ -26,10 +26,14 @@ func Test_InMemory_Not_Started_Board(t *testing.T) {
 }
 
 func Test_InMemory_Sync(t *testing.T) {
-	first := internal.NewBoard(10, 10, 1)
+	first := internal.NewBoardFromInitializedMatrix(internal.Matrix{
+		{internal.NewTile()},
+	})
 	game := NewInMemory(&first)
 
-	second := internal.NewBoard(4, 5, 2)
+	second := internal.NewBoardFromInitializedMatrix(internal.Matrix{
+		{internal.NewTile(internal.WithBomb())},
+	})
 
 	assert.NoError(t, game.Sync(second))
 

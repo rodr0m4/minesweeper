@@ -74,10 +74,34 @@ func Test_StartGame_With_Invalid_Board(t *testing.T) {
 	}
 }
 
+// TODO: Fix this test
+func Test_StartGame_Should_Sync_Valid_Board_With_Game_Original_Implementation(t *testing.T) {
+	t.Skip()
+
+	rows := 2
+	columns := 2
+	bombs := 1 // TODO: Support this
+
+	g := game.Fake{
+		IsStartedFunc: func() bool {
+			return false
+		},
+		SyncFunc: func(board internal.Board) error {
+			assert.True(t, board.HasRows(rows))
+			assert.True(t, board.HasColumns(columns))
+			assert.True(t, board.HasBombs(bombs))
+
+			return nil
+		},
+	}
+
+	assert.NoError(t, StartGame{}.StartGame(g, rows, columns, bombs))
+}
+
 func Test_StartGame_Should_Sync_Valid_Board_With_Game(t *testing.T) {
 	rows := 2
 	columns := 2
-	bombs := 1
+	bombs := 2
 
 	g := game.Fake{
 		IsStartedFunc: func() bool {

@@ -29,7 +29,9 @@ func Test_Should_Fail_With_Error_If_Cant_Find_Board(t *testing.T) {
 }
 
 func Test_Should_Call_BoardDrawer_If_No_Error(t *testing.T) {
-	board := internal.NewBoard(2, 2, 1)
+	board := internal.NewBoardFromInitializedMatrix(internal.Matrix{
+		{internal.NewTile()},
+	})
 	result := []string{"Hello", "World"}
 
 	g := game.Fake{

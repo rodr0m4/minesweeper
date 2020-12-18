@@ -18,7 +18,10 @@ func Test_Tap_Should_Fail_If_Game_Board_Fails(t *testing.T) {
 }
 
 func Test_Tap_Should_Fail_If_Position_Is_Invalid(t *testing.T) {
-	board := internal.NewBoard(2, 2, 1)
+	board := internal.NewBoardFromInitializedMatrix(internal.Matrix{
+		{internal.NewTile(), internal.NewTile(internal.WithBomb())},
+		{internal.NewTile(), internal.NewTile()},
+	})
 
 	_, err := Tap{}.Tap(gameWhoseBoardSucceedsWith(board), 4, 4)
 
@@ -26,7 +29,10 @@ func Test_Tap_Should_Fail_If_Position_Is_Invalid(t *testing.T) {
 }
 
 func Test_Tap_Should_Tap_On_Tile_If_Valid_Position(t *testing.T) {
-	board := internal.NewBoard(2, 2, 0) // No bombs!
+	board := internal.NewBoardFromInitializedMatrix(internal.Matrix{
+		{internal.NewTile(), internal.NewTile()},
+		{internal.NewTile(), internal.NewTile()},
+	})
 	tile := board.Find(internal.Position{})
 
 	result, err := Tap{}.Tap(gameWhoseBoardSucceedsWith(board), 0, 0)
