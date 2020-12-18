@@ -6,6 +6,7 @@ import (
 	"errors"
 	"minesweeper/internal"
 	"minesweeper/internal/platform/game"
+	"minesweeper/internal/platform/rest/middleware"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -21,9 +22,9 @@ func Test_Tap_Should_Fail_When_Passed_Invalid_JSON(t *testing.T) {
 	rr := httptest.NewRecorder()
 	_, r := gin.CreateTestContext(rr)
 
-	r.PATCH("/games", handler.Tap)
+	registerTap(r, handler)
 
-	req := httptest.NewRequest(http.MethodPatch, "/games", bytes.NewBufferString("<title/>"))
+	req := newTapRequestFromBytes([]byte("<title/>"))
 
 	r.ServeHTTP(rr, req)
 
@@ -44,14 +45,12 @@ func Test_Tap_Fails_If_Game_Board_Fails(t *testing.T) {
 	rr := httptest.NewRecorder()
 	_, r := gin.CreateTestContext(rr)
 
-	r.PATCH("/games", handler.Tap)
+	registerTap(r, handler)
 
-	body := gin.H{
+	req := newTapRequest(gin.H{
 		"row":    5,
 		"column": 5,
-	}
-	buf, _ := json.Marshal(body)
-	req := httptest.NewRequest(http.MethodPatch, "/games", bytes.NewBuffer(buf))
+	})
 
 	r.ServeHTTP(rr, req)
 
@@ -66,16 +65,31 @@ func Test_Tap_Fails_If_Invalid_Position(t *testing.T) {
 	_, r := gin.CreateTestContext(rr)
 
 	handler := TapHandler{Game: g}
-	r.PATCH("/games", handler.Tap)
 
-	body := gin.H{
+	registerTap(r, handler)
+
+	req := newTapRequest(gin.H{
 		"row":    5,
 		"column": 5,
-	}
-	buf, _ := json.Marshal(body)
-	req := httptest.NewRequest(http.MethodPatch, "/games", bytes.NewBuffer(buf))
+	})
 
 	r.ServeHTTP(rr, req)
 
 	assert.Equal(t, http.StatusBadRequest, rr.Code)
+}
+
+// Helpers
+
+func newTapRequestFromBytes(buf []byte) *http.Request {
+	return httptest.NewRequest(http.MethodPatch, "/games", bytes.NewBuffer(buf))
+}
+
+func newTapRequest(body gin.H) *http.Request {
+	buf, _ := json.Marshal(body)
+	return newTapRequestFromBytes(buf)
+}
+
+func registerTap(r *gin.Engine, handler TapHandler) {
+	r.Use(middleware.ErrorLogger())
+	r.PATCH("/games", handler.Tap)
 }

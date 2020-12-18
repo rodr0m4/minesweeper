@@ -7,6 +7,7 @@ import (
 	"minesweeper/internal"
 	"minesweeper/internal/operation"
 	"minesweeper/internal/platform/game"
+	"minesweeper/internal/platform/rest/middleware"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -22,7 +23,7 @@ func Test_StartGame_Should_Fail_When_Passed_Invalid_JSON(t *testing.T) {
 	rr := httptest.NewRecorder()
 	_, r := gin.CreateTestContext(rr)
 
-	r.POST("/games", handler.StartGame)
+	registerStartGame(r, handler)
 
 	req := httptest.NewRequest(http.MethodPost, "/games", bytes.NewBufferString("<title/>"))
 
@@ -55,7 +56,8 @@ func Test_Should_Fail_When_Game_Cant_Start(t *testing.T) {
 		handler := StartGameHandler{
 			GameStarter: tt.starter,
 		}
-		r.POST("/games", handler.StartGame)
+
+		registerStartGame(r, handler)
 
 		req := newStartGameRequest()
 
@@ -87,7 +89,7 @@ func Test_Should_Fail_When_ShowGame_Fails(t *testing.T) {
 	rr := httptest.NewRecorder()
 	_, r := gin.CreateTestContext(rr)
 
-	r.POST("/games", handler.StartGame)
+	registerStartGame(r, handler)
 
 	r.ServeHTTP(rr, newStartGameRequest())
 
@@ -118,7 +120,7 @@ func Test_Should_Return_Showed_Game_And_Created_When_Passes(t *testing.T) {
 	rr := httptest.NewRecorder()
 	_, r := gin.CreateTestContext(rr)
 
-	r.POST("/games", handler.StartGame)
+	registerStartGame(r, handler)
 
 	r.ServeHTTP(rr, newStartGameRequest())
 
@@ -142,6 +144,11 @@ func newStartGameRequest() *http.Request {
 	req := httptest.NewRequest(http.MethodPost, "/games", buf)
 
 	return req
+}
+
+func registerStartGame(r *gin.Engine, handler StartGameHandler) {
+	r.Use(middleware.ErrorLogger())
+	r.POST("/games", handler.StartGame)
 }
 
 // Mocks

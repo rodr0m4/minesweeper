@@ -1,8 +1,6 @@
 package rest
 
 import (
-	"errors"
-	"minesweeper/internal"
 	"minesweeper/internal/operation"
 	"minesweeper/internal/platform/game"
 	"net/http"
@@ -43,38 +41,16 @@ func (s StartGameHandler) StartGame(ctx *gin.Context) {
 	}
 
 	if err := s.GameStarter.StartGame(s.Game, request.Rows, request.Columns, request.Bombs); err != nil {
-		abortWithError(ctx, err)
+		_ = ctx.Error(err)
 		return
 	}
 
 	sg, err := s.GameShower.ShowGame(s.Game)
 
 	if err != nil {
-		abortWithError(ctx, err)
+		_ = ctx.Error(err)
 		return
 	}
 
 	ctx.JSON(http.StatusCreated, sg)
-}
-
-func errorToStatusCode(err error) int {
-	if errors.Is(err, internal.ErrInvalidOperation) {
-		return http.StatusBadRequest
-	}
-
-	return http.StatusInternalServerError
-}
-
-// TODO: Refactor these into a middleware
-func abortWithError(ctx *gin.Context, err error) {
-	abortWithErrorAndStatus(ctx, errorToStatusCode(err), err)
-}
-
-func abortWithErrorAndStatus(ctx *gin.Context, code int, err error) {
-	var json JSONError
-
-	json.Code = code
-	json.Message = err.Error()
-
-	ctx.AbortWithStatusJSON(code, json)
 }

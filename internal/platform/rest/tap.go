@@ -25,14 +25,14 @@ func (h TapHandler) Tap(ctx *gin.Context) {
 	board, err := h.Game.Board()
 
 	if err != nil {
-		abortWithError(ctx, err)
+		_ = ctx.Error(err)
 		return
 	}
 
 	_, err = board.Position(request.Row, request.Column)
 
 	if err != nil {
-		abortWithError(ctx, err)
+		_ = ctx.Error(err)
 		return
 	}
 }

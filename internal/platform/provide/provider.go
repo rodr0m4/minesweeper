@@ -4,12 +4,18 @@ import (
 	"minesweeper/internal/operation"
 	"minesweeper/internal/platform/game"
 	"minesweeper/internal/platform/rest"
+	"minesweeper/internal/platform/rest/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GinEngine() *gin.Engine {
-	return gin.Default()
+	r := gin.Default()
+
+	// r.Use(gin.ErrorLogger())
+	r.Use(middleware.ErrorLogger())
+
+	return r
 }
 
 func Game() game.Game {

@@ -1,7 +1,6 @@
 package game
 
 import (
-	"errors"
 	"minesweeper/internal"
 	"sync"
 )
@@ -24,7 +23,7 @@ func (i *InMemory) IsStarted() bool {
 
 func (i *InMemory) Board() (internal.Board, error) {
 	if !i.IsStarted() {
-		return internal.Board{}, errors.New("game not yet started")
+		return internal.Board{}, internal.NewInvalidOperation("game not yet started")
 	}
 
 	var board internal.Board

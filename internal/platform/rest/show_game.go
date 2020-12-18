@@ -16,7 +16,7 @@ func (h ShowGameHandler) ShowGame(ctx *gin.Context) {
 	sg, err := h.GameShower.ShowGame(h.Game)
 
 	if err != nil {
-		abortWithError(ctx, err)
+		_ = ctx.Error(err)
 		return
 	}
 
