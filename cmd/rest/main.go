@@ -4,6 +4,7 @@ import (
 	"log"
 	"minesweeper/internal/platform/provide"
 	"minesweeper/internal/platform/rest"
+	"os"
 )
 
 func main() {
@@ -13,6 +14,8 @@ func main() {
 }
 
 func run() error {
+	port := os.Getenv("PORT")
+
 	game := provide.Game()
 	showGame := provide.ShowGame()
 
@@ -25,5 +28,5 @@ func run() error {
 
 	server.RegisterRoutes()
 
-	return server.Engine.Run()
+	return server.Engine.Run(":" + port)
 }

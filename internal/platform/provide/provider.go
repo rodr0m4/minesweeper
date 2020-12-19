@@ -3,6 +3,7 @@ package provide
 import (
 	"minesweeper/internal/operation"
 	"minesweeper/internal/platform/game"
+	"minesweeper/internal/platform/random"
 	"minesweeper/internal/platform/rest"
 	"minesweeper/internal/platform/rest/middleware"
 
@@ -31,7 +32,7 @@ func ShowGame() operation.ShowGame {
 func StartGameHandler(game game.Game, showGame operation.ShowGame) *rest.StartGameHandler {
 	return &rest.StartGameHandler{
 		Game:        game,
-		GameStarter: operation.StartGame{},
+		GameStarter: operation.StartGame{Rand: random.Real{}},
 		GameShower:  showGame,
 	}
 }
