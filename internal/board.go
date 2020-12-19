@@ -153,3 +153,26 @@ func (b Board) isOutOfBounds(row int, column int) bool {
 func (b Board) outOfBoundsError(row int, column int) error {
 	return NewInvalidOperation(fmt.Sprintf("invalid position access (%d, %d) when Board is %dx%d, use Board::Position for creating a valid Position", row, column, b.rows, b.columns))
 }
+
+func (b Board) FindAdjacentTo(position Position) []Position {
+	row := position.Row
+	column := position.Column
+
+	potentialPositions := []Position{
+		{Row: row - 1, Column: column}, // Top tile
+		{Row: row + 1, Column: column}, // Bottom tile
+		{Row: row, Column: column - 1}, // Left tile
+		{Row: row, Column: column + 1}, // Right tile
+	}
+
+	// We filter every out of bounds value
+	var adjacent []Position
+
+	for _, position := range potentialPositions {
+		if !b.isOutOfBounds(position.Row, position.Column) {
+			adjacent = append(adjacent, position)
+		}
+	}
+
+	return adjacent
+}
