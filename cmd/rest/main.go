@@ -24,6 +24,7 @@ func run() error {
 		Game:             game,
 		StartGameHandler: provide.StartGameHandler(game, showGame),
 		ShowGameHandler:  provide.ShowGameHandler(game, showGame),
+		TapHandler:       provide.TapHandler(game),
 	}
 
 	server.RegisterRoutes()

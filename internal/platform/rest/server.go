@@ -11,4 +11,5 @@ type Server struct {
 	Game             game.Game
 	StartGameHandler *StartGameHandler
 	ShowGameHandler  *ShowGameHandler
+	TapHandler       *TapHandler
 }
