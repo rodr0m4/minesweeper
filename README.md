@@ -67,7 +67,6 @@ It returns a JSON that contains a `result` field that signals if the game is los
 This code is very WIP, several features are missing:
 
 * Client Library
-* Revealing cells when a non-bomb tile is tapped.
 * Marking a Tile with a flag or a question mark.
 * A persistant implementation of Game
 * Time Tracking
