@@ -6,7 +6,7 @@ func (s *Server) RegisterRoutes() {
 	showGameHandler := s.ShowGameHandler
 	tapHandler := s.TapHandler
 
-	r.POST("/games", startGameHandler.StartGame)
-	r.GET("/games", showGameHandler.ShowGame)
-	r.PATCH("/games", tapHandler.Tap)
+	r.POST("/game", startGameHandler.StartGame)
+	r.GET("/game", showGameHandler.ShowGame)
+	r.POST("/game/tap", tapHandler.Tap)
 }
