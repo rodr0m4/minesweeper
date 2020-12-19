@@ -1,0 +1,7 @@
+{
+  "name": "Minesweeper challenge",
+  "description": "A minesweeper REST implementation",
+  "keywords": [],
+  "website": "http://github.com/rodr0m4/minesweeper",
+  "repository": "http://github.com/rodr0m4/minesweeper"
+}
