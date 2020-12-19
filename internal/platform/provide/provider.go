@@ -44,11 +44,12 @@ func ShowGameHandler(game game.Game, showGame operation.ShowGame) *rest.ShowGame
 	}
 }
 
-func TapHandler(game game.Game) *rest.TapHandler {
+func TapHandler(game game.Game, showGame operation.ShowGame) *rest.TapHandler {
 	return &rest.TapHandler{
 		Game: game,
 		Tapper: operation.Tap{
 			GameFinisher: operation.FinishGame{},
 		},
+		GameShower: showGame,
 	}
 }

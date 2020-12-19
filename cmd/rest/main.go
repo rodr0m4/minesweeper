@@ -14,7 +14,12 @@ func main() {
 }
 
 func run() error {
-	port := os.Getenv("PORT")
+	port := "8080"
+
+	envPort := os.Getenv("PORT")
+	if envPort != "" {
+		port = envPort
+	}
 
 	game := provide.Game()
 	showGame := provide.ShowGame()
@@ -24,7 +29,7 @@ func run() error {
 		Game:             game,
 		StartGameHandler: provide.StartGameHandler(game, showGame),
 		ShowGameHandler:  provide.ShowGameHandler(game, showGame),
-		TapHandler:       provide.TapHandler(game),
+		TapHandler:       provide.TapHandler(game, showGame),
 	}
 
 	server.RegisterRoutes()
