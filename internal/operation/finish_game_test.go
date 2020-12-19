@@ -17,7 +17,9 @@ func Test_Finish_Game_Fails_When_Game_Board_Fails(t *testing.T) {
 }
 
 func Test_Finish_Game_Reveals_Every_Tile_In_The_Board_And_Syncs(t *testing.T) {
-	board := internal.NewBoard(1, 1, 0)
+	board := internal.NewBoardFromInitializedMatrix(internal.Matrix{
+		{internal.NewTile()},
+	})
 
 	g := gameWhoseBoardSucceedsWith(board)
 

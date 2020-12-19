@@ -2,7 +2,7 @@ package internal
 
 import (
 	"fmt"
-	"math/rand"
+	"minesweeper/internal/platform/random"
 )
 
 type Matrix = [][]*Tile
@@ -42,10 +42,10 @@ func NewBoardFromInitializedMatrix(matrix Matrix) Board {
 	}
 }
 
-func NewBoard(rows, columns, bombs int) Board {
+func NewBoard(rand random.Intn, rows, columns, bombs int) Board {
 	matrix := newMatrix(rows, columns)
 
-	for _, position := range bombPositions(rows, columns, bombs) {
+	for _, position := range bombPositions(rand, rows, columns, bombs) {
 		matrix[position.Row][position.Column].hasBomb = true
 	}
 
@@ -111,7 +111,7 @@ func newMatrix(rows int, columns int) Matrix {
 // TODO: Optimize
 // Naive algorithm
 // TODO: There is a bug with one bomb
-func bombPositions(rows, columns, bombs int) []Position {
+func bombPositions(rand random.Intn, rows, columns, bombs int) []Position {
 	var positions []Position
 
 	for i := 0; i < bombs-1; i++ {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"minesweeper/internal"
 	"minesweeper/internal/platform/game"
+	"minesweeper/internal/platform/random"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -116,5 +117,9 @@ func Test_StartGame_Should_Sync_Valid_Board_With_Game(t *testing.T) {
 		},
 	}
 
-	assert.NoError(t, StartGame{}.StartGame(g, rows, columns, bombs))
+	start := StartGame{
+		Rand: random.NewSequence([]int{0, 0, 1, 1}),
+	}
+
+	assert.NoError(t, start.StartGame(g, rows, columns, bombs))
 }

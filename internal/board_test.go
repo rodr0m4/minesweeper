@@ -1,13 +1,14 @@
 package internal
 
 import (
+	"minesweeper/internal/platform/random"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_A_Board_Is_Created_With_The_Given_Rows_And_Columns(t *testing.T) {
-	board := NewBoard(10, 10, 0)
+	board := NewBoard(random.Fixed{}, 10, 10, 0)
 
 	assert.True(t, board.HasRows(10))
 	assert.True(t, board.HasColumns(10))
@@ -17,7 +18,7 @@ func Test_A_Board_Is_Created_With_The_Given_Rows_And_Columns(t *testing.T) {
 }
 
 func Test_A_Board_Has_An_Area(t *testing.T) {
-	board := NewBoard(5, 5, 0)
+	board := NewBoard(random.Fixed{}, 5, 5, 0)
 
 	assert.True(t, board.HasArea(25))
 	assert.False(t, board.HasArea(100))
@@ -27,7 +28,7 @@ func Test_Board_Position_For_Valid_Positions(t *testing.T) {
 	var position Position
 	var err error
 
-	board := NewBoard(10, 10, 0)
+	board := NewBoard(random.Fixed{}, 10, 10, 0)
 
 	position, err = board.Position(0, 0)
 	assert.NoError(t, err)
@@ -45,7 +46,7 @@ func Test_Board_Position_For_Valid_Positions(t *testing.T) {
 func Test_Board_Position_For_Invalid_Positions(t *testing.T) {
 	var err error
 
-	board := NewBoard(10, 10, 0)
+	board := NewBoard(random.Fixed{}, 10, 10, 0)
 
 	_, err = board.Position(-1, -1)
 	assert.Error(t, err)
@@ -58,7 +59,7 @@ func Test_Board_Position_For_Invalid_Positions(t *testing.T) {
 }
 
 func Test_Find_On_Empty_Board(t *testing.T) {
-	board := NewBoard(10, 10, 0)
+	board := NewBoard(random.Fixed{}, 10, 10, 0)
 
 	tile := board.Find(Position{}) // We find the tile on the top-left
 
@@ -67,21 +68,12 @@ func Test_Find_On_Empty_Board(t *testing.T) {
 }
 
 func Test_Find_On_A_Board_With_Bombs(t *testing.T) {
-	expectedBombs := 2
-	board := NewBoard(2, 2, expectedBombs)
-	expectedNotBombs := board.Area() - expectedBombs
+	rand := random.NewSequence([]int{0, 0, 1, 1})
+	board := NewBoard(rand, 2, 2, 2)
 
-	var bombs int
-	var notBombs int
+	assert.True(t, board.Find(Position{Row: 0, Column: 0}).hasBomb)
+	assert.True(t, board.Find(Position{Row: 1, Column: 1}).hasBomb)
 
-	board.Traverse(func(tile *Tile, _ Position) {
-		if tile.hasBomb {
-			bombs++
-		} else {
-			notBombs++
-		}
-	})
-
-	assert.Equal(t, expectedBombs, bombs, "should have %d bombs, found %d", expectedBombs, bombs)
-	assert.Equal(t, expectedNotBombs, notBombs, "should have %d not-bombs, found %d", expectedNotBombs, notBombs)
+	assert.False(t, board.Find(Position{Row: 1, Column: 0}).hasBomb)
+	assert.False(t, board.Find(Position{Row: 0, Column: 1}).hasBomb)
 }
