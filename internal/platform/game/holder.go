@@ -20,6 +20,7 @@ type InMemoryHolder struct {
 type Holder interface {
 	Insert(Game) (ID, error)
 	Get(ID) (Game, error)
+	Delete(ID) error
 }
 
 func NewInMemoryHolder() *InMemoryHolder {
@@ -53,6 +54,13 @@ func (h *InMemoryHolder) Get(id ID) (Game, error) {
 	}
 
 	return game, nil
+}
+
+func (h *InMemoryHolder) Delete(id ID) error {
+	h.execute(func() {
+		delete(h.Games, id)
+	})
+	return nil
 }
 
 func (h *InMemoryHolder) execute(f func()) {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"minesweeper/internal/platform/provide"
 	"minesweeper/internal/platform/rest"
@@ -29,6 +30,7 @@ func run() error {
 		Engine:            provide.GinEngine(),
 		GameHolder:        gameHolder,
 		CreateGameHandler: provide.CreateGameHandler(gameHolder, boardDrawer),
+		DeleteGameHandler: provide.DeleteGameHandler(gameHolder, boardDrawer),
 		ShowGameHandler:   provide.ShowGameHandler(gameHolder, boardDrawer),
 		ModifyTileHandler: provide.ModifyTileHandler(gameHolder, boardDrawer),
 	}
@@ -40,6 +42,7 @@ func run() error {
 
 func shouldRevealEverything() bool {
 	env := strings.ToLower(os.Getenv("REVEAL_EVERYTHING"))
+	fmt.Printf("env is %s", env)
 
 	switch env {
 	case "", "false":

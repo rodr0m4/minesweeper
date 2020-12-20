@@ -212,6 +212,7 @@ func registerModifyTile(r *gin.Engine, handler ModifyTileHandler) {
 type gameHolderMock struct {
 	InsertFunc func(game.Game) (game.ID, error)
 	GetFunc    func(game.ID) (game.Game, error)
+	DeleteFunc func(game.ID) error
 }
 
 func (g gameHolderMock) Insert(game game.Game) (game.ID, error) {
@@ -220,6 +221,10 @@ func (g gameHolderMock) Insert(game game.Game) (game.ID, error) {
 
 func (g gameHolderMock) Get(id game.ID) (game.Game, error) {
 	return g.GetFunc(id)
+}
+
+func (g gameHolderMock) Delete(id game.ID) error {
+	return g.DeleteFunc(id)
 }
 
 func initializedGameHolder(games map[game.ID]game.Game) *game.InMemoryHolder {

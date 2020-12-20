@@ -37,6 +37,15 @@ func CreateGameHandler(holder game.Holder, boardDrawer operation.BoardDrawer) *r
 	}
 }
 
+func DeleteGameHandler(holder game.Holder, boardDrawer operation.BoardDrawer) *rest.DeleteGameHandler {
+	return &rest.DeleteGameHandler{
+		GameDeleter: operation.DeleteGame{
+			Holder:      holder,
+			BoardDrawer: boardDrawer,
+		},
+	}
+}
+
 func ShowGameHandler(holder game.Holder, boardDrawer operation.BoardDrawer) *rest.ShowGameHandler {
 	return &rest.ShowGameHandler{
 		GameHolder:  holder,
