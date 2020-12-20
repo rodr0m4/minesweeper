@@ -12,7 +12,7 @@ import (
 )
 
 type ModifyTileHandler struct {
-	Game        game.Game
+	GameHolder  game.Holder
 	BoardDrawer operation.BoardDrawer
 	Tapper      Tapper
 	Marker      Marker
@@ -44,6 +44,13 @@ func (h ModifyTileHandler) Mark(ctx *gin.Context) {
 		return
 	}
 
+	g, err := h.getGame(ctx)
+
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
 	mark, err := stringToTileMark(request.Mark)
 
 	if err != nil {
@@ -51,12 +58,12 @@ func (h ModifyTileHandler) Mark(ctx *gin.Context) {
 		return
 	}
 
-	if err := h.Marker.Mark(h.Game, request.Row, request.Column, mark); err != nil {
+	if err := h.Marker.Mark(g, request.Row, request.Column, mark); err != nil {
 		_ = ctx.Error(err)
 		return
 	}
 
-	h.renderBoard(ctx, "")
+	h.renderBoard(ctx, g, "")
 }
 
 func (h ModifyTileHandler) Tap(ctx *gin.Context) {
@@ -66,18 +73,25 @@ func (h ModifyTileHandler) Tap(ctx *gin.Context) {
 		return
 	}
 
-	result, err := h.Tapper.Tap(h.Game, request.Row, request.Column)
+	g, err := h.getGame(ctx)
 
 	if err != nil {
 		_ = ctx.Error(err)
 		return
 	}
 
-	h.renderBoard(ctx, tapResultToString(result))
+	result, err := h.Tapper.Tap(g, request.Row, request.Column)
+
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	h.renderBoard(ctx, g, tapResultToString(result))
 }
 
-func (h ModifyTileHandler) renderBoard(ctx *gin.Context, result string) {
-	showed, err := operation.DrawGame(h.Game, h.BoardDrawer)
+func (h ModifyTileHandler) renderBoard(ctx *gin.Context, game game.Game, result string) {
+	showed, err := operation.DrawGame(game, h.BoardDrawer)
 
 	if err != nil {
 		_ = ctx.Error(err)
@@ -90,6 +104,16 @@ func (h ModifyTileHandler) renderBoard(ctx *gin.Context, result string) {
 	response.Lines = showed.Lines
 
 	ctx.JSON(http.StatusOK, response)
+}
+
+func (h ModifyTileHandler) getGame(ctx *gin.Context) (game.Game, error) {
+	id, err := ExtractIDFromPath(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return h.GameHolder.Get(id)
 }
 
 func (h ModifyTileHandler) bindRequest(ctx *gin.Context) (modifyTileRequest, error) {

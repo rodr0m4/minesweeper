@@ -37,6 +37,9 @@ func Test_Tap_Should_Fail_When_Tapper_Fails(t *testing.T) {
 	column := 1
 
 	handler := ModifyTileHandler{
+		GameHolder: initializedGameHolder(map[game.ID]game.Game{
+			0: gameWhoseBoardSucceedsWith(internal.Board{}),
+		}),
 		Tapper: tapperThatExpectsAndReturns(t, row, column, func() (internal.TapResult, error) {
 			return internal.NothingResult, errors.New("oh no")
 		}),
@@ -53,7 +56,11 @@ func Test_Tap_Should_Fail_When_Tapper_Fails(t *testing.T) {
 }
 
 func Test_Mark_Should_Fail_With_Bad_Request_When_Invalid_Mark(t *testing.T) {
-	handler := ModifyTileHandler{}
+	handler := ModifyTileHandler{
+		GameHolder: initializedGameHolder(map[game.ID]game.Game{
+			0: gameWhoseBoardSucceedsWith(internal.Board{}),
+		}),
+	}
 
 	rr := httptest.NewRecorder()
 	_, r := gin.CreateTestContext(rr)
@@ -70,6 +77,9 @@ func Test_Mark_Should_Fail_When_Marker_Fails(t *testing.T) {
 	column := 1
 
 	handler := ModifyTileHandler{
+		GameHolder: initializedGameHolder(map[game.ID]game.Game{
+			0: gameWhoseBoardSucceedsWith(internal.Board{}),
+		}),
 		Marker: markerThatExpectsAndReturns(t, row, column, internal.FlagMark, errors.New("oh no")),
 	}
 
@@ -88,7 +98,9 @@ func Test_Mark_Should_Call_ShowBoard_When_Marker_Does_Not_Fail(t *testing.T) {
 	column := 1
 
 	handler := ModifyTileHandler{
-		Game:   gameWhoseBoardSucceedsWith(internal.Board{}),
+		GameHolder: initializedGameHolder(map[game.ID]game.Game{
+			0: gameWhoseBoardSucceedsWith(internal.Board{}),
+		}),
 		Marker: markerThatExpectsAndReturns(t, row, column, internal.QuestionMark, nil),
 		BoardDrawer: boardDrawerMock(func(board internal.Board) operation.ShowedGame {
 			return operation.ShowedGame{}
@@ -138,7 +150,7 @@ func Test_Tap_Should_Convert_TapResult_To_String(t *testing.T) {
 			})
 
 			handler := ModifyTileHandler{
-				Game:        gameWhoseBoardSucceedsWith(internal.Board{}),
+				GameHolder:  gameHolderThatAlwaysReturns(gameWhoseBoardSucceedsWith(internal.Board{})),
 				Tapper:      tapper,
 				BoardDrawer: drawer,
 			}
@@ -163,11 +175,11 @@ func Test_Tap_Should_Convert_TapResult_To_String(t *testing.T) {
 // Helpers
 
 func newTapRequestFromBytes(buf []byte) *http.Request {
-	return httptest.NewRequest(http.MethodPost, "/game/tap", bytes.NewBuffer(buf))
+	return httptest.NewRequest(http.MethodPost, "/games/0/tap", bytes.NewBuffer(buf))
 }
 
 func newMarkRequestFromBytes(buf []byte) *http.Request {
-	return httptest.NewRequest(http.MethodPost, "/game/mark", bytes.NewBuffer(buf))
+	return httptest.NewRequest(http.MethodPost, "/games/0/mark", bytes.NewBuffer(buf))
 }
 
 func newTapRequest(row, column int) *http.Request {
@@ -191,11 +203,42 @@ func newMarkRequest(row, column int, mark string) *http.Request {
 
 func registerModifyTile(r *gin.Engine, handler ModifyTileHandler) {
 	r.Use(middleware.ErrorLogger())
-	r.POST("/game/tap", handler.Tap)
-	r.POST("/game/mark", handler.Mark)
+	r.POST("/games/:id/tap", handler.Tap)
+	r.POST("/games/:id/mark", handler.Mark)
 }
 
 // Mocks
+
+type gameHolderMock struct {
+	InsertFunc func(game.Game) (game.ID, error)
+	GetFunc    func(game.ID) (game.Game, error)
+}
+
+func (g gameHolderMock) Insert(game game.Game) (game.ID, error) {
+	return g.InsertFunc(game)
+}
+
+func (g gameHolderMock) Get(id game.ID) (game.Game, error) {
+	return g.GetFunc(id)
+}
+
+func initializedGameHolder(games map[game.ID]game.Game) *game.InMemoryHolder {
+	holder := game.NewInMemoryHolder()
+
+	for id, g := range games {
+		holder.Games[id] = g
+	}
+
+	return holder
+}
+
+func gameHolderThatAlwaysReturns(g game.Game) game.Holder {
+	return gameHolderMock{
+		GetFunc: func(_ game.ID) (game.Game, error) {
+			return g, nil
+		},
+	}
+}
 
 type TapperMock func(game game.Game, row, column int) (internal.TapResult, error)
 

@@ -14,7 +14,7 @@ type ID int
 type InMemoryHolder struct {
 	mutex     sync.Mutex
 	currentID int
-	games     map[ID]Game
+	Games     map[ID]Game
 }
 
 type Holder interface {
@@ -24,7 +24,7 @@ type Holder interface {
 
 func NewInMemoryHolder() *InMemoryHolder {
 	return &InMemoryHolder{
-		games: make(map[ID]Game),
+		Games: make(map[ID]Game),
 	}
 }
 
@@ -34,7 +34,7 @@ func (h *InMemoryHolder) Insert(game Game) (ID, error) {
 	h.execute(func() {
 		id = ID(h.currentID)
 		h.currentID++
-		h.games[id] = game
+		h.Games[id] = game
 	})
 
 	return id, nil
@@ -45,7 +45,7 @@ func (h *InMemoryHolder) Get(id ID) (Game, error) {
 	var ok bool
 
 	h.execute(func() {
-		game, ok = h.games[id]
+		game, ok = h.Games[id]
 	})
 
 	if !ok {

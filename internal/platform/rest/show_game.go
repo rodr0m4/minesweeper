@@ -9,12 +9,26 @@ import (
 )
 
 type ShowGameHandler struct {
-	Game        game.Game
+	GameHolder  game.Holder
 	BoardDrawer operation.BoardDrawer
 }
 
 func (h ShowGameHandler) ShowGame(ctx *gin.Context) {
-	sg, err := operation.DrawGame(h.Game, h.BoardDrawer)
+	id, err := ExtractIDFromPath(ctx)
+
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	g, err := h.GameHolder.Get(id)
+
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	sg, err := operation.DrawGame(g, h.BoardDrawer)
 
 	if err != nil {
 		_ = ctx.Error(err)

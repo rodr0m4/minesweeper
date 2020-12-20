@@ -19,10 +19,6 @@ func GinEngine() *gin.Engine {
 	return r
 }
 
-func Game() game.Game {
-	return game.NewInMemory(nil)
-}
-
 func GameHolder() game.Holder {
 	return game.NewInMemoryHolder()
 }
@@ -48,24 +44,16 @@ func CreateGameHandler(holder game.Holder, boardDrawer operation.BoardDrawer) *r
 	}
 }
 
-func StartGameHandler(game game.Game, boardDrawer operation.BoardDrawer) *rest.StartGameHandler {
-	return &rest.StartGameHandler{
-		Game:        game,
-		GameStarter: operation.StartGame{Rand: random.Real{}},
-		BoardDrawer: boardDrawer,
-	}
-}
-
-func ShowGameHandler(game game.Game, boardDrawer operation.BoardDrawer) *rest.ShowGameHandler {
+func ShowGameHandler(holder game.Holder, boardDrawer operation.BoardDrawer) *rest.ShowGameHandler {
 	return &rest.ShowGameHandler{
-		Game:        game,
+		GameHolder:  holder,
 		BoardDrawer: boardDrawer,
 	}
 }
 
-func ModifyTileHandler(game game.Game, boardDrawer operation.BoardDrawer) *rest.ModifyTileHandler {
+func ModifyTileHandler(holder game.Holder, boardDrawer operation.BoardDrawer) *rest.ModifyTileHandler {
 	return &rest.ModifyTileHandler{
-		Game:        game,
+		GameHolder:  holder,
 		BoardDrawer: boardDrawer,
 		Tapper: operation.Tap{
 			GameFinisher: operation.FinishGame{},
