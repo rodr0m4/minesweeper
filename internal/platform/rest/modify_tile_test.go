@@ -13,18 +13,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Tap_Should_Fail_When_Passed_Invalid_JSON(t *testing.T) {
-	handler := TapHandler{}
+	handler := ModifyTileHandler{}
 
 	rr := httptest.NewRecorder()
 	_, r := gin.CreateTestContext(rr)
 
-	registerTap(r, handler)
+	registerModifyTile(r, handler)
 
 	req := newTapRequestFromBytes([]byte("<title/>"))
 
@@ -41,14 +40,14 @@ func Test_Tap_Should_Fail_When_Tapper_Fails(t *testing.T) {
 		return internal.NothingResult, errors.New("oh no")
 	})
 
-	handler := TapHandler{
+	handler := ModifyTileHandler{
 		Tapper: tapper,
 	}
 
 	rr := httptest.NewRecorder()
 	_, r := gin.CreateTestContext(rr)
 
-	registerTap(r, handler)
+	registerModifyTile(r, handler)
 
 	r.ServeHTTP(rr, newTapRequest(row, column))
 
@@ -87,7 +86,7 @@ func Test_Tap_Should_Convert_TapResult_To_String(t *testing.T) {
 				return operation.ShowedGame{}
 			})
 
-			handler := TapHandler{
+			handler := ModifyTileHandler{
 				Game:        gameWhoseBoardSucceedsWith(internal.Board{}),
 				Tapper:      tapper,
 				BoardDrawer: drawer,
@@ -96,13 +95,13 @@ func Test_Tap_Should_Convert_TapResult_To_String(t *testing.T) {
 			rr := httptest.NewRecorder()
 			_, r := gin.CreateTestContext(rr)
 
-			registerTap(r, handler)
+			registerModifyTile(r, handler)
 
 			r.ServeHTTP(rr, newTapRequest(row, column))
 
 			assert.Equal(t, http.StatusOK, rr.Code)
 
-			var response tapHandlerResponse
+			var response modifyTileResponse
 			_ = json.Unmarshal(rr.Body.Bytes(), &response)
 
 			assert.Equal(t, tt.expect, response.Result)
@@ -113,8 +112,12 @@ func Test_Tap_Should_Convert_TapResult_To_String(t *testing.T) {
 // Helpers
 
 func newTapRequestFromBytes(buf []byte) *http.Request {
-	return httptest.NewRequest(http.MethodPatch, "/games", bytes.NewBuffer(buf))
+	return httptest.NewRequest(http.MethodPost, "/games/tap", bytes.NewBuffer(buf))
 }
+
+//func newMarkRequestFromBytes(buf []byte) *http.Request {
+//	return httptest.NewRequest(http.MethodPatch, "/games/mark", bytes.NewBuffer(buf))
+//}
 
 func newTapRequest(row, column int) *http.Request {
 	body := gin.H{
@@ -125,9 +128,10 @@ func newTapRequest(row, column int) *http.Request {
 	return newTapRequestFromBytes(buf)
 }
 
-func registerTap(r *gin.Engine, handler TapHandler) {
+func registerModifyTile(r *gin.Engine, handler ModifyTileHandler) {
 	r.Use(middleware.ErrorLogger())
-	r.PATCH("/games", handler.Tap)
+	r.POST("/games/tap", handler.Tap)
+	r.POST("/games/mark", handler.Mark)
 }
 
 // Mocks

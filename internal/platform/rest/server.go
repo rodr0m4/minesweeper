@@ -7,9 +7,9 @@ import (
 )
 
 type Server struct {
-	Engine           *gin.Engine
-	Game             game.Game
-	StartGameHandler *StartGameHandler
-	ShowGameHandler  *ShowGameHandler
-	TapHandler       *TapHandler
+	Engine            *gin.Engine
+	Game              game.Game
+	StartGameHandler  *StartGameHandler
+	ShowGameHandler   *ShowGameHandler
+	ModifyTileHandler *ModifyTileHandler
 }

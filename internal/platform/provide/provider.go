@@ -42,13 +42,22 @@ func ShowGameHandler(game game.Game, boardDrawer operation.BoardDrawer) *rest.Sh
 	}
 }
 
-func TapHandler(game game.Game, boardDrawer operation.BoardDrawer) *rest.TapHandler {
-	return &rest.TapHandler{
-		Game: game,
+func ModifyTileHandler(game game.Game, boardDrawer operation.BoardDrawer) *rest.ModifyTileHandler {
+	return &rest.ModifyTileHandler{
+		Game:        game,
+		BoardDrawer: boardDrawer,
 		Tapper: operation.Tap{
 			GameFinisher: operation.FinishGame{},
 			TileRevealer: operation.RevealAdjacent{},
 		},
-		BoardDrawer: boardDrawer,
+		Marker: nil,
 	}
+	//return &rest.TapHandler{
+	//	Game: game,
+	//	Tapper: operation.Tap{
+	//		GameFinisher: operation.FinishGame{},
+	//		TileRevealer: operation.RevealAdjacent{},
+	//	},
+	//	BoardDrawer: boardDrawer,
+	//}
 }
