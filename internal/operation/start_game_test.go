@@ -88,9 +88,9 @@ func Test_StartGame_Should_Sync_Valid_Board_With_Game_Original_Implementation(t 
 			return false
 		},
 		SyncFunc: func(board internal.Board) error {
-			assert.True(t, board.HasRows(rows))
-			assert.True(t, board.HasColumns(columns))
-			assert.True(t, board.HasBombs(bombs))
+			assert.Equal(t, rows, board.Rows())
+			assert.Equal(t, columns, board.Columns())
+			assert.Equal(t, bombs, board.Bombs())
 
 			return nil
 		},
@@ -109,9 +109,9 @@ func Test_StartGame_Should_Sync_Valid_Board_With_Game(t *testing.T) {
 			return false
 		},
 		SyncFunc: func(board internal.Board) error {
-			assert.True(t, board.HasRows(rows))
-			assert.True(t, board.HasColumns(columns))
-			assert.True(t, board.HasBombs(bombs))
+			assert.Equal(t, rows, board.Rows())
+			assert.Equal(t, columns, board.Columns())
+			assert.Equal(t, bombs, board.Bombs())
 
 			return nil
 		},

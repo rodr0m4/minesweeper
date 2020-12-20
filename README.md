@@ -104,3 +104,4 @@ minesweeper ->
 * A Tile represents a square in the game, it can be hidden, revealed or marked (with a Flag or a Question Mark) and can have a bomb or not.
 * A Board is a matrix of randomly assigned tiles
 * A Game is a Board handler, used for abstracting over a persistent/volatile store.
+* A Game Holder stores multiple game sessions.

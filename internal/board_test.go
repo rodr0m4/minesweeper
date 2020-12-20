@@ -10,18 +10,11 @@ import (
 func Test_A_Board_Is_Created_With_The_Given_Rows_And_Columns(t *testing.T) {
 	board := NewBoard(random.Fixed{}, 10, 10, 0)
 
-	assert.True(t, board.HasRows(10))
-	assert.True(t, board.HasColumns(10))
+	assert.Equal(t, 10, board.Rows())
+	assert.Equal(t, 10, board.Columns())
 
-	assert.False(t, board.HasRows(5))
-	assert.False(t, board.HasColumns(5))
-}
-
-func Test_A_Board_Has_An_Area(t *testing.T) {
-	board := NewBoard(random.Fixed{}, 5, 5, 0)
-
-	assert.True(t, board.HasArea(25))
-	assert.False(t, board.HasArea(100))
+	assert.NotEqual(t, 5, board.Rows())
+	assert.NotEqual(t, 5, board.Columns())
 }
 
 func Test_Board_Position_For_Valid_Positions(t *testing.T) {

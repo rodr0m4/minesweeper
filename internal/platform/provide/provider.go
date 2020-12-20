@@ -27,13 +27,6 @@ func BoardDrawer(revealEverything bool) operation.DefaultBoardDrawer {
 	return operation.DefaultBoardDrawer{RevealEverything: revealEverything}
 }
 
-func CreateGame(holder game.Holder) operation.CreateGame {
-	return operation.CreateGame{
-		Holder: holder,
-		Rand:   random.Real{},
-	}
-}
-
 func CreateGameHandler(holder game.Holder, boardDrawer operation.BoardDrawer) *rest.CreateGameHandler {
 	return &rest.CreateGameHandler{
 		GameCreator: operation.CreateGame{

@@ -2,8 +2,6 @@ package game
 
 import "minesweeper/internal"
 
-type Factory = func() Game
-
 // A Game represents the internal state of a Minesweeper game
 type Game interface {
 	// IsStarted reports if the game has already started (a first call to Sync

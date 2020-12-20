@@ -52,24 +52,16 @@ func NewBoard(rand random.Intn, rows, columns, bombs int) Board {
 	return NewBoardFromInitializedMatrix(matrix)
 }
 
-func (b Board) HasRows(i int) bool {
-	return b.rows == i
+func (b Board) Rows() int {
+	return b.rows
 }
 
-func (b Board) HasColumns(i int) bool {
-	return b.columns == i
+func (b Board) Columns() int {
+	return b.columns
 }
 
-func (b Board) HasBombs(i int) bool {
-	return b.bombs == i
-}
-
-func (b Board) Area() int {
-	return b.rows * b.columns
-}
-
-func (b Board) HasArea(i int) bool {
-	return b.Area() == i
+func (b Board) Bombs() int {
+	return b.bombs
 }
 
 func (b Board) Find(position Position) *Tile {
