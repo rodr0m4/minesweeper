@@ -17,13 +17,47 @@ func DrawBoardIntoStringArray(board Board, revealEverything bool) []string {
 		}
 
 		sb.WriteRune('|')
-		sb.WriteRune(bombToRun(tile))
-		sb.WriteRune(stateToRune(tile))
+		writeTile(sb, tile, revealEverything)
 	})
 
 	flush(sb, &rows)
 
 	return rows
+}
+
+func writeTile(sb *strings.Builder, tile *Tile, revealEverything bool) {
+	if revealEverything {
+		writeTileRevealing(sb, tile)
+	} else {
+		writeTileNotRevealing(sb, tile)
+	}
+}
+
+func writeTileNotRevealing(sb *strings.Builder, tile *Tile) {
+	switch state := tile.State().(type) {
+	case MarkedTile:
+		var r rune
+		if state.Mark == QuestionMark {
+			r = '?'
+		}
+		if state.Mark == FlagMark {
+			r = 'F'
+		}
+		sb.WriteRune(r)
+	case HiddenTile:
+		sb.WriteRune(' ')
+	default:
+		if tile.HasBomb() {
+			sb.WriteRune('X')
+		} else {
+			sb.WriteRune('/')
+		}
+	}
+}
+
+func writeTileRevealing(sb *strings.Builder, tile *Tile) {
+	sb.WriteRune(bombToRune(tile))
+	sb.WriteRune(stateToRune(tile))
 }
 
 func stateToRune(tile *Tile) rune {
@@ -39,7 +73,7 @@ func stateToRune(tile *Tile) rune {
 	panic(fmt.Errorf("unrecheable code: invalid tile state %d", tile.State()))
 }
 
-func bombToRun(tile *Tile) rune {
+func bombToRune(tile *Tile) rune {
 	if tile.HasBomb() {
 		return 'X'
 	} else {

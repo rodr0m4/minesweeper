@@ -102,7 +102,7 @@ func (h ModifyTileHandler) bindRequest(ctx *gin.Context) (modifyTileRequest, err
 func tapResultToString(result internal.TapResult) string {
 	switch result {
 	case internal.NothingResult:
-		return "Nothing"
+		return "Nothing Happened"
 	case internal.ExplosionResult:
 		return "BOOM!"
 	}

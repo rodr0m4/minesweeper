@@ -23,8 +23,8 @@ func Game() game.Game {
 	return game.NewInMemory(nil)
 }
 
-func BoardDrawer() operation.DefaultBoardDrawer {
-	return operation.DefaultBoardDrawer{}
+func BoardDrawer(revealEverything bool) operation.DefaultBoardDrawer {
+	return operation.DefaultBoardDrawer{RevealEverything: revealEverything}
 }
 
 func StartGameHandler(game game.Game, boardDrawer operation.BoardDrawer) *rest.StartGameHandler {

@@ -67,12 +67,10 @@ It returns a JSON that contains a `result` field that signals if the game is los
 This code is very WIP, several features are missing:
 
 * Client Library
-* Marking a Tile with a flag or a question mark.
 * A persistant implementation of Game
 * Time Tracking
 * Multiple accounts
 * Multiple games
-* Not revealing the internal state of every tile (right now it just shows everything).
 
 ## Design Decisions
 

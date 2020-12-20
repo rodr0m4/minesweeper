@@ -114,7 +114,7 @@ func Test_Tap_Should_Convert_TapResult_To_String(t *testing.T) {
 	cases := []Case{
 		{
 			given:  internal.NothingResult,
-			expect: "Nothing",
+			expect: "Nothing Happened",
 		},
 		{
 			given:  internal.ExplosionResult,

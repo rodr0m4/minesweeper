@@ -5,6 +5,7 @@ import (
 	"minesweeper/internal/platform/provide"
 	"minesweeper/internal/platform/rest"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -22,7 +23,7 @@ func run() error {
 	}
 
 	game := provide.Game()
-	boardDrawer := provide.BoardDrawer()
+	boardDrawer := provide.BoardDrawer(shouldRevealEverything())
 
 	server := &rest.Server{
 		Engine:            provide.GinEngine(),
@@ -35,4 +36,15 @@ func run() error {
 	server.RegisterRoutes()
 
 	return server.Engine.Run(":" + port)
+}
+
+func shouldRevealEverything() bool {
+	env := strings.ToLower(os.Getenv("REVEAL_EVERYTHING"))
+
+	switch env {
+	case "", "false":
+		return false
+	default:
+		return true
+	}
 }

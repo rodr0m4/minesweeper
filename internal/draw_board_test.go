@@ -53,3 +53,21 @@ func Test_Draw_Board_Revealing(t *testing.T) {
 		})
 	}
 }
+
+func Test_Draw_Board_Not_Revealing(t *testing.T) {
+	board := NewBoardFromInitializedMatrix(Matrix{
+		{NewTile(WithBomb()), NewTile()},
+		{NewTile(WithBomb(), Reveal()), NewTile(Reveal())},
+		{NewTile(WithBomb(), WithMark(QuestionMark)), NewTile(WithBomb(), WithMark(FlagMark))},
+		{NewTile(WithMark(QuestionMark)), NewTile(WithMark(FlagMark))},
+	})
+
+	expect := []string{
+		"| | |",
+		"|X|/|",
+		"|?|F|",
+		"|?|F|",
+	}
+
+	assert.Equal(t, expect, DrawBoardIntoStringArray(board, false))
+}
