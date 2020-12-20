@@ -47,6 +47,7 @@ func TapHandler(game game.Game, boardDrawer operation.BoardDrawer) *rest.TapHand
 		Game: game,
 		Tapper: operation.Tap{
 			GameFinisher: operation.FinishGame{},
+			TileRevealer: operation.RevealAdjacent{},
 		},
 		BoardDrawer: boardDrawer,
 	}
