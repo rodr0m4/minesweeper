@@ -34,7 +34,7 @@ func Test_Draw_Board_Revealing(t *testing.T) {
 		{
 			name: "with flagged and revealed tiles",
 			given: Matrix{
-				{NewTile(WithBomb(), Flag()), NewTile()},
+				{NewTile(WithBomb(), WithMark(FlagMark)), NewTile()},
 				{NewTile(WithBomb()), NewTile(Reveal())},
 			},
 			expect: []string{"|XF|OH|", "|XH|OR|"},

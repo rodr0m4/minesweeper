@@ -6,19 +6,24 @@ type TileState interface {
 	isTileState()
 }
 
-// HidenTileState is when a tile is not revealed, it can be tagged with a
-// number of adjacent tiles
 type HiddenTile struct {
-	// How many Tiles are close to this one
-	Adjacent int
 }
 
 func (h HiddenTile) isTileState() {
 }
 
-type FlaggedTile struct{}
+type MarkedTile struct {
+	Mark TileMark
+}
 
-func (f FlaggedTile) isTileState() {
+type TileMark int
+
+const (
+	FlagMark TileMark = iota
+	QuestionMark
+)
+
+func (f MarkedTile) isTileState() {
 }
 
 type RevealedTile struct{}

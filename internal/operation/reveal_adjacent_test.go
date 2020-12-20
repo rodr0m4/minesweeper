@@ -72,9 +72,9 @@ func Test_RevealAdjacent_In_Corner_Multiple_Passes(t *testing.T) {
 func Test_RevealAdjacent_In_The_Middle_Complex_Passes(t *testing.T) {
 	board := internal.NewBoardFromInitializedMatrix(internal.Matrix{
 		{internal.NewTile(), internal.NewTile(), internal.NewTile(internal.WithBomb()), internal.NewTile()},
-		{internal.NewTile(internal.WithBomb()), internal.NewTile(internal.WithBomb()), internal.NewTile(), internal.NewTile(internal.Flag())},
+		{internal.NewTile(internal.WithBomb()), internal.NewTile(internal.WithBomb()), internal.NewTile(), internal.NewTile(internal.WithMark(internal.FlagMark))},
 		{internal.NewTile(internal.WithBomb()), internal.NewTile(), internal.NewTile(), internal.NewTile(internal.WithBomb())},
-		{internal.NewTile(internal.WithBomb()), internal.NewTile(), internal.NewTile(internal.Flag()), internal.NewTile()},
+		{internal.NewTile(internal.WithBomb()), internal.NewTile(), internal.NewTile(internal.WithMark(internal.QuestionMark)), internal.NewTile()},
 	})
 
 	ra := RevealAdjacent{}

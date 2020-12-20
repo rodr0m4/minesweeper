@@ -49,7 +49,7 @@ func Test_Tap_Invalid_Operation(t *testing.T) {
 		},
 		{
 			name:              "in a flagged tile",
-			state:             FlaggedTile{},
+			state:             MarkedTile{},
 			showableTileState: "flagged",
 		},
 	}

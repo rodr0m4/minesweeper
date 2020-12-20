@@ -32,7 +32,7 @@ func stateToRune(tile *Tile) rune {
 		return 'H'
 	case RevealedTile:
 		return 'R'
-	case FlaggedTile:
+	case MarkedTile:
 		return 'F'
 	}
 

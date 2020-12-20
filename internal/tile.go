@@ -20,12 +20,12 @@ func WithBomb() TileOption {
 	}
 }
 
-func Flag() TileOption {
-	return WithState(FlaggedTile{})
+func WithMark(mark TileMark) TileOption {
+	return WithState(MarkedTile{Mark: mark})
 }
 
-func Mark(adjacent int) TileOption {
-	return WithState(HiddenTile{Adjacent: adjacent})
+func Hidden() TileOption {
+	return WithState(HiddenTile{})
 }
 
 func Reveal() TileOption {
@@ -67,7 +67,7 @@ func (t *Tile) Tap() (result TapResult, err error) {
 	case RevealedTile:
 		err = ErrCantTapOnRevealedTile
 		return
-	case FlaggedTile:
+	case MarkedTile:
 		err = ErrCantTapOnFlaggedTile
 		return
 	}
