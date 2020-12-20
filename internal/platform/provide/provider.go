@@ -23,8 +23,29 @@ func Game() game.Game {
 	return game.NewInMemory(nil)
 }
 
+func GameHolder() game.Holder {
+	return game.NewInMemoryHolder()
+}
+
 func BoardDrawer(revealEverything bool) operation.DefaultBoardDrawer {
 	return operation.DefaultBoardDrawer{RevealEverything: revealEverything}
+}
+
+func CreateGame(holder game.Holder) operation.CreateGame {
+	return operation.CreateGame{
+		Holder: holder,
+		Rand:   random.Real{},
+	}
+}
+
+func CreateGameHandler(holder game.Holder, boardDrawer operation.BoardDrawer) *rest.CreateGameHandler {
+	return &rest.CreateGameHandler{
+		GameCreator: operation.CreateGame{
+			Holder: holder,
+			Rand:   random.Real{},
+		},
+		BoardDrawer: boardDrawer,
+	}
 }
 
 func StartGameHandler(game game.Game, boardDrawer operation.BoardDrawer) *rest.StartGameHandler {
@@ -52,12 +73,4 @@ func ModifyTileHandler(game game.Game, boardDrawer operation.BoardDrawer) *rest.
 		},
 		Marker: nil,
 	}
-	//return &rest.TapHandler{
-	//	Game: game,
-	//	Tapper: operation.Tap{
-	//		GameFinisher: operation.FinishGame{},
-	//		TileRevealer: operation.RevealAdjacent{},
-	//	},
-	//	BoardDrawer: boardDrawer,
-	//}
 }

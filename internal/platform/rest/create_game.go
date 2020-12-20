@@ -3,6 +3,7 @@ package rest
 import (
 	"minesweeper/internal"
 	"minesweeper/internal/operation"
+	"minesweeper/internal/platform/game"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,7 @@ type CreateGameHandler struct {
 }
 
 type GameCreator interface {
-	CreateGame(rows, columns, bombs int) (int, internal.Board, error)
+	CreateGame(rows, columns, bombs int) (game.ID, internal.Board, error)
 }
 
 type createGameRequest struct {
@@ -42,7 +43,7 @@ func (h CreateGameHandler) CreateGame(ctx *gin.Context) {
 	}
 
 	response := createGameResponse{
-		ID:    id,
+		ID:    int(id),
 		Lines: h.BoardDrawer.DrawBoard(board).Lines,
 	}
 

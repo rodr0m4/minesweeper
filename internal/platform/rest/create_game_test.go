@@ -6,6 +6,7 @@ import (
 	"errors"
 	"minesweeper/internal"
 	"minesweeper/internal/operation"
+	"minesweeper/internal/platform/game"
 	"minesweeper/internal/platform/rest/middleware"
 	"net/http"
 	"net/http/httptest"
@@ -35,7 +36,7 @@ func Test_CreateGame_Should_Fail_If_GameCreator_Fails(t *testing.T) {
 	bombs := 1
 
 	handler := CreateGameHandler{
-		GameCreator: gameCreatorThatExpectsAndReturns(t, rows, columns, bombs, func() (int, internal.Board, error) {
+		GameCreator: gameCreatorThatExpectsAndReturns(t, rows, columns, bombs, func() (game.ID, internal.Board, error) {
 			return 0, internal.Board{}, errors.New("oh no")
 		}),
 	}
@@ -59,7 +60,7 @@ func Test_CreateGame_Should_Call_DrawBoard_If_Can_CreateGame(t *testing.T) {
 	lines := []string{"hello", "world"}
 
 	handler := CreateGameHandler{
-		GameCreator: gameCreatorThatExpectsAndReturns(t, rows, columns, bombs, func() (int, internal.Board, error) {
+		GameCreator: gameCreatorThatExpectsAndReturns(t, rows, columns, bombs, func() (game.ID, internal.Board, error) {
 			return 0, board, nil
 		}),
 		BoardDrawer: boardDrawerMock(func(actual internal.Board) operation.ShowedGame {
@@ -102,14 +103,14 @@ func newCreateGameRequestFromBytes(buf []byte) *http.Request {
 
 // Mocks
 
-type gameCreatorMock func(rows, columns, bombs int) (int, internal.Board, error)
+type gameCreatorMock func(rows, columns, bombs int) (game.ID, internal.Board, error)
 
-func (g gameCreatorMock) CreateGame(rows, columns, bombs int) (int, internal.Board, error) {
+func (g gameCreatorMock) CreateGame(rows, columns, bombs int) (game.ID, internal.Board, error) {
 	return g(rows, columns, bombs)
 }
 
-func gameCreatorThatExpectsAndReturns(t *testing.T, rows, columns, bombs int, f func() (int, internal.Board, error)) gameCreatorMock {
-	return func(actualRows, actualColumns, actualBombs int) (int, internal.Board, error) {
+func gameCreatorThatExpectsAndReturns(t *testing.T, rows, columns, bombs int, f func() (game.ID, internal.Board, error)) gameCreatorMock {
+	return func(actualRows, actualColumns, actualBombs int) (game.ID, internal.Board, error) {
 		assert.Equal(t, rows, actualRows)
 		assert.Equal(t, columns, actualColumns)
 		assert.Equal(t, bombs, actualBombs)

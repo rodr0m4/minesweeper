@@ -23,11 +23,14 @@ func run() error {
 	}
 
 	game := provide.Game()
+	gameHolder := provide.GameHolder()
 	boardDrawer := provide.BoardDrawer(shouldRevealEverything())
 
 	server := &rest.Server{
 		Engine:            provide.GinEngine(),
 		Game:              game,
+		GameHolder:        gameHolder,
+		CreateGameHandler: provide.CreateGameHandler(gameHolder, boardDrawer),
 		StartGameHandler:  provide.StartGameHandler(game, boardDrawer),
 		ShowGameHandler:   provide.ShowGameHandler(game, boardDrawer),
 		ModifyTileHandler: provide.ModifyTileHandler(game, boardDrawer),
