@@ -55,33 +55,6 @@ func Test_Tap_Should_Fail_When_Tapper_Fails(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 }
 
-func Test_Tap_Should_Fail_If_Tap_Passes_And_Shower_Fails(t *testing.T) {
-	row := 1
-	column := 1
-
-	tapper := TapperThatExpectsAndReturns(t, row, column, func() (internal.TapResult, error) {
-		return internal.NothingResult, nil
-	})
-
-	shower := gameShowerMock(func(g game.Game) (operation.ShowedGame, error) {
-		return operation.ShowedGame{}, errors.New("oh no")
-	})
-
-	handler := TapHandler{
-		Tapper:     tapper,
-		GameShower: shower,
-	}
-
-	rr := httptest.NewRecorder()
-	_, r := gin.CreateTestContext(rr)
-
-	registerTap(r, handler)
-
-	r.ServeHTTP(rr, newTapRequest(1, 1))
-
-	assert.Equal(t, http.StatusInternalServerError, rr.Code)
-}
-
 func Test_Tap_Should_Convert_TapResult_To_String(t *testing.T) {
 	type Case struct {
 		given  internal.TapResult
@@ -110,13 +83,14 @@ func Test_Tap_Should_Convert_TapResult_To_String(t *testing.T) {
 				return tt.given, nil
 			})
 
-			shower := gameShowerMock(func(g game.Game) (operation.ShowedGame, error) {
-				return operation.ShowedGame{}, nil
+			drawer := boardDrawerMock(func(board internal.Board) operation.ShowedGame {
+				return operation.ShowedGame{}
 			})
 
 			handler := TapHandler{
-				Tapper:     tapper,
-				GameShower: shower,
+				Game:        gameWhoseBoardSucceedsWith(internal.Board{}),
+				Tapper:      tapper,
+				BoardDrawer: drawer,
 			}
 
 			rr := httptest.NewRecorder()

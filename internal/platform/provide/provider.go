@@ -23,33 +23,31 @@ func Game() game.Game {
 	return game.NewInMemory(nil)
 }
 
-func ShowGame() operation.ShowGame {
-	return operation.ShowGame{
-		BoardDrawer: operation.BoardDrawer{},
-	}
+func BoardDrawer() operation.DefaultBoardDrawer {
+	return operation.DefaultBoardDrawer{}
 }
 
-func StartGameHandler(game game.Game, showGame operation.ShowGame) *rest.StartGameHandler {
+func StartGameHandler(game game.Game, boardDrawer operation.BoardDrawer) *rest.StartGameHandler {
 	return &rest.StartGameHandler{
 		Game:        game,
 		GameStarter: operation.StartGame{Rand: random.Real{}},
-		GameShower:  showGame,
+		BoardDrawer: boardDrawer,
 	}
 }
 
-func ShowGameHandler(game game.Game, showGame operation.ShowGame) *rest.ShowGameHandler {
+func ShowGameHandler(game game.Game, boardDrawer operation.BoardDrawer) *rest.ShowGameHandler {
 	return &rest.ShowGameHandler{
-		Game:       game,
-		GameShower: showGame,
+		Game:        game,
+		BoardDrawer: boardDrawer,
 	}
 }
 
-func TapHandler(game game.Game, showGame operation.ShowGame) *rest.TapHandler {
+func TapHandler(game game.Game, boardDrawer operation.BoardDrawer) *rest.TapHandler {
 	return &rest.TapHandler{
 		Game: game,
 		Tapper: operation.Tap{
 			GameFinisher: operation.FinishGame{},
 		},
-		GameShower: showGame,
+		BoardDrawer: boardDrawer,
 	}
 }

@@ -67,54 +67,25 @@ func Test_Should_Fail_When_Game_Cant_Start(t *testing.T) {
 	}
 }
 
-func Test_Should_Fail_When_ShowGame_Fails(t *testing.T) {
-	g := game.Fake{}
-	err := errors.New("oh no")
-
-	starter := gameStarterMock(func(_ game.Game, _, _, _ int) error {
-		return nil
-	})
-	shower := gameShowerMock(func(actual game.Game) (operation.ShowedGame, error) {
-		assert.Equal(t, g, actual)
-
-		return operation.ShowedGame{}, err
-	})
-
-	handler := StartGameHandler{
-		Game:        g,
-		GameStarter: starter,
-		GameShower:  shower,
-	}
-
-	rr := httptest.NewRecorder()
-	_, r := gin.CreateTestContext(rr)
-
-	registerStartGame(r, handler)
-
-	r.ServeHTTP(rr, newStartGameRequest())
-
-	assert.Equal(t, http.StatusInternalServerError, rr.Code)
-}
-
 func Test_Should_Return_Showed_Game_And_Created_When_Passes(t *testing.T) {
-	g := game.Fake{}
+	board := internal.NewBoardFromInitializedMatrix(internal.Matrix{})
+	g := gameWhoseBoardSucceedsWith(board)
 	lines := []string{"Hello", "World"}
 
 	starter := gameStarterMock(func(_ game.Game, _, _, _ int) error {
 		return nil
 	})
-	shower := gameShowerMock(func(actual game.Game) (operation.ShowedGame, error) {
-		assert.Equal(t, g, actual)
-
+	drawer := boardDrawerMock(func(actual internal.Board) operation.ShowedGame {
+		assert.Equal(t, board, actual)
 		return operation.ShowedGame{
 			Lines: lines,
-		}, nil
+		}
 	})
 
 	handler := StartGameHandler{
 		Game:        g,
 		GameStarter: starter,
-		GameShower:  shower,
+		BoardDrawer: drawer,
 	}
 
 	rr := httptest.NewRecorder()
@@ -153,10 +124,10 @@ func registerStartGame(r *gin.Engine, handler StartGameHandler) {
 
 // Mocks
 
-type gameShowerMock func(game.Game) (operation.ShowedGame, error)
+type boardDrawerMock func(internal.Board) operation.ShowedGame
 
-func (g gameShowerMock) ShowGame(game game.Game) (operation.ShowedGame, error) {
-	return g(game)
+func (m boardDrawerMock) DrawBoard(board internal.Board) operation.ShowedGame {
+	return m(board)
 }
 
 type gameStarterMock func(game game.Game, rows, columns, bombs int) error
@@ -168,5 +139,13 @@ func (g gameStarterMock) StartGame(game game.Game, rows, columns, bombs int) err
 func gameStarterThatFailsWith(err error) gameStarterMock {
 	return func(game game.Game, rows, columns, bombs int) error {
 		return err
+	}
+}
+
+func gameWhoseBoardSucceedsWith(board internal.Board) game.Fake {
+	return game.Fake{
+		BoardFunc: func() (internal.Board, error) {
+			return board, nil
+		},
 	}
 }

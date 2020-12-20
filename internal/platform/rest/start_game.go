@@ -30,7 +30,7 @@ type GameShower interface {
 type StartGameHandler struct {
 	Game        game.Game
 	GameStarter GameStarter
-	GameShower  GameShower
+	BoardDrawer operation.BoardDrawer
 }
 
 func (s StartGameHandler) StartGame(ctx *gin.Context) {
@@ -45,7 +45,7 @@ func (s StartGameHandler) StartGame(ctx *gin.Context) {
 		return
 	}
 
-	sg, err := s.GameShower.ShowGame(s.Game)
+	sg, err := operation.DrawGame(s.Game, s.BoardDrawer)
 
 	if err != nil {
 		_ = ctx.Error(err)

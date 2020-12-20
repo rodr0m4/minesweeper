@@ -11,9 +11,9 @@ import (
 )
 
 type TapHandler struct {
-	Game       game.Game
-	Tapper     Tapper
-	GameShower GameShower
+	Game        game.Game
+	Tapper      Tapper
+	BoardDrawer operation.BoardDrawer
 }
 
 type tapHandlerRequest struct {
@@ -44,7 +44,7 @@ func (h TapHandler) Tap(ctx *gin.Context) {
 		return
 	}
 
-	showed, err := h.GameShower.ShowGame(h.Game)
+	showed, err := operation.DrawGame(h.Game, h.BoardDrawer)
 
 	if err != nil {
 		_ = ctx.Error(err)

@@ -22,14 +22,14 @@ func run() error {
 	}
 
 	game := provide.Game()
-	showGame := provide.ShowGame()
+	boardDrawer := provide.BoardDrawer()
 
 	server := &rest.Server{
 		Engine:           provide.GinEngine(),
 		Game:             game,
-		StartGameHandler: provide.StartGameHandler(game, showGame),
-		ShowGameHandler:  provide.ShowGameHandler(game, showGame),
-		TapHandler:       provide.TapHandler(game, showGame),
+		StartGameHandler: provide.StartGameHandler(game, boardDrawer),
+		ShowGameHandler:  provide.ShowGameHandler(game, boardDrawer),
+		TapHandler:       provide.TapHandler(game, boardDrawer),
 	}
 
 	server.RegisterRoutes()

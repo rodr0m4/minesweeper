@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"minesweeper/internal/operation"
 	"minesweeper/internal/platform/game"
 	"net/http"
 
@@ -8,12 +9,12 @@ import (
 )
 
 type ShowGameHandler struct {
-	Game       game.Game
-	GameShower GameShower
+	Game        game.Game
+	BoardDrawer operation.BoardDrawer
 }
 
 func (h ShowGameHandler) ShowGame(ctx *gin.Context) {
-	sg, err := h.GameShower.ShowGame(h.Game)
+	sg, err := operation.DrawGame(h.Game, h.BoardDrawer)
 
 	if err != nil {
 		_ = ctx.Error(err)
