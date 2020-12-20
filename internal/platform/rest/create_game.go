@@ -25,8 +25,8 @@ type createGameRequest struct {
 }
 
 type createGameResponse struct {
-	ID    int      `json:"id"`
-	Lines []string `json:"lines"`
+	ID   int                  `json:"id"`
+	Game operation.ShowedGame `json:"game"`
 }
 
 func (h CreateGameHandler) CreateGame(ctx *gin.Context) {
@@ -43,8 +43,8 @@ func (h CreateGameHandler) CreateGame(ctx *gin.Context) {
 	}
 
 	response := createGameResponse{
-		ID:    int(id),
-		Lines: h.BoardDrawer.DrawBoard(board).Lines,
+		ID:   int(id),
+		Game: h.BoardDrawer.DrawBoard(board),
 	}
 
 	ctx.JSON(http.StatusCreated, response)

@@ -24,7 +24,11 @@ func GameHolder() game.Holder {
 }
 
 func BoardDrawer(revealEverything bool) operation.DefaultBoardDrawer {
-	return operation.DefaultBoardDrawer{RevealEverything: revealEverything}
+	return operation.DefaultBoardDrawer{
+		RevealEverything: revealEverything,
+		ShowTiles:        true,
+		ShowLines:        true,
+	}
 }
 
 func CreateGameHandler(holder game.Holder, boardDrawer operation.BoardDrawer) *rest.CreateGameHandler {

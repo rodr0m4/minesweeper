@@ -33,8 +33,8 @@ type modifyTileRequest struct {
 }
 
 type modifyTileResponse struct {
-	Result string   `json:"result"`
-	Lines  []string `json:"lines"`
+	Result string               `json:"result"`
+	Game   operation.ShowedGame `json:"game"`
 }
 
 func (h ModifyTileHandler) Mark(ctx *gin.Context) {
@@ -101,7 +101,7 @@ func (h ModifyTileHandler) renderBoard(ctx *gin.Context, game game.Game, result 
 	var response modifyTileResponse
 
 	response.Result = result
-	response.Lines = showed.Lines
+	response.Game = showed
 
 	ctx.JSON(http.StatusOK, response)
 }
