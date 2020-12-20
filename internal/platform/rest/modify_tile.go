@@ -6,6 +6,7 @@ import (
 	"minesweeper/internal/operation"
 	"minesweeper/internal/platform/game"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,12 +23,13 @@ type Tapper interface {
 }
 
 type Marker interface {
-	Mark(game game.Game, row, column int) error
+	Mark(game game.Game, row, column int, mark internal.TileMark) error
 }
 
 type modifyTileRequest struct {
-	Row    int `json:"row"`
-	Column int `json:"column"`
+	Row    int    `json:"row"`
+	Column int    `json:"column"`
+	Mark   string `json:"mark"`
 }
 
 type modifyTileResponse struct {
@@ -42,7 +44,14 @@ func (h ModifyTileHandler) Mark(ctx *gin.Context) {
 		return
 	}
 
-	if err := h.Marker.Mark(h.Game, request.Row, request.Column); err != nil {
+	mark, err := stringToTileMark(request.Mark)
+
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+
+	if err := h.Marker.Mark(h.Game, request.Row, request.Column, mark); err != nil {
 		_ = ctx.Error(err)
 		return
 	}
@@ -99,4 +108,17 @@ func tapResultToString(result internal.TapResult) string {
 	}
 
 	panic(fmt.Sprintf("unrecheable code, invalid tap result %d", result))
+}
+
+func stringToTileMark(s string) (internal.TileMark, error) {
+	s = strings.ToLower(s)
+
+	switch s {
+	case "flag":
+		return internal.FlagMark, nil
+	case "question":
+		return internal.QuestionMark, nil
+	}
+
+	return 0, internal.NewInvalidOperation(fmt.Sprintf("invalid tile mark %s", s))
 }

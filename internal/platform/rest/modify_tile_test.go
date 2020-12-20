@@ -52,12 +52,25 @@ func Test_Tap_Should_Fail_When_Tapper_Fails(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 }
 
+func Test_Mark_Should_Fail_With_Bad_Request_When_Invalid_Mark(t *testing.T) {
+	handler := ModifyTileHandler{}
+
+	rr := httptest.NewRecorder()
+	_, r := gin.CreateTestContext(rr)
+
+	registerModifyTile(r, handler)
+
+	r.ServeHTTP(rr, newMarkRequest(1, 1, "other"))
+
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
+}
+
 func Test_Mark_Should_Fail_When_Marker_Fails(t *testing.T) {
 	row := 1
 	column := 1
 
 	handler := ModifyTileHandler{
-		Marker: markerThatExpectsAndReturns(t, row, column, errors.New("oh no")),
+		Marker: markerThatExpectsAndReturns(t, row, column, internal.FlagMark, errors.New("oh no")),
 	}
 
 	rr := httptest.NewRecorder()
@@ -65,9 +78,31 @@ func Test_Mark_Should_Fail_When_Marker_Fails(t *testing.T) {
 
 	registerModifyTile(r, handler)
 
-	r.ServeHTTP(rr, newMarkRequest(row, column))
+	r.ServeHTTP(rr, newMarkRequest(row, column, "flag"))
 
 	assert.Equal(t, http.StatusInternalServerError, rr.Code)
+}
+
+func Test_Mark_Should_Call_ShowBoard_When_Marker_Does_Not_Fail(t *testing.T) {
+	row := 1
+	column := 1
+
+	handler := ModifyTileHandler{
+		Game:   gameWhoseBoardSucceedsWith(internal.Board{}),
+		Marker: markerThatExpectsAndReturns(t, row, column, internal.QuestionMark, nil),
+		BoardDrawer: boardDrawerMock(func(board internal.Board) operation.ShowedGame {
+			return operation.ShowedGame{}
+		}),
+	}
+
+	rr := httptest.NewRecorder()
+	_, r := gin.CreateTestContext(rr)
+
+	registerModifyTile(r, handler)
+
+	r.ServeHTTP(rr, newMarkRequest(row, column, "question"))
+
+	assert.Equal(t, http.StatusOK, rr.Code)
 }
 
 func Test_Tap_Should_Convert_TapResult_To_String(t *testing.T) {
@@ -144,10 +179,11 @@ func newTapRequest(row, column int) *http.Request {
 	return newTapRequestFromBytes(buf)
 }
 
-func newMarkRequest(row, column int) *http.Request {
+func newMarkRequest(row, column int, mark string) *http.Request {
 	body := gin.H{
 		"row":    row,
 		"column": column,
+		"mark":   mark,
 	}
 	buf, _ := json.Marshal(body)
 	return newMarkRequestFromBytes(buf)
@@ -167,10 +203,10 @@ func (t TapperMock) Tap(game game.Game, row, column int) (internal.TapResult, er
 	return t(game, row, column)
 }
 
-type markerMock func(game game.Game, row, column int) error
+type markerMock func(game game.Game, row, column int, mark internal.TileMark) error
 
-func (m markerMock) Mark(game game.Game, row, column int) error {
-	return m(game, row, column)
+func (m markerMock) Mark(game game.Game, row, column int, mark internal.TileMark) error {
+	return m(game, row, column, mark)
 }
 
 func tapperThatExpectsAndReturns(t *testing.T, row, column int, f func() (internal.TapResult, error)) TapperMock {
@@ -181,10 +217,12 @@ func tapperThatExpectsAndReturns(t *testing.T, row, column int, f func() (intern
 	}
 }
 
-func markerThatExpectsAndReturns(t *testing.T, row, column int, err error) markerMock {
-	return func(game game.Game, actualRow, actualColumn int) error {
+func markerThatExpectsAndReturns(t *testing.T, row, column int, mark internal.TileMark, err error) markerMock {
+	return func(game game.Game, actualRow, actualColumn int, actualMark internal.TileMark) error {
 		assert.Equal(t, row, actualRow)
 		assert.Equal(t, column, actualColumn)
+		assert.Equal(t, mark, actualMark)
+
 		return err
 	}
 }
