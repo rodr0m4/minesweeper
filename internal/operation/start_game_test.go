@@ -75,13 +75,10 @@ func Test_StartGame_With_Invalid_Board(t *testing.T) {
 	}
 }
 
-// TODO: Fix this test
-func Test_StartGame_Should_Sync_Valid_Board_With_Game_Original_Implementation(t *testing.T) {
-	t.Skip()
-
+func Test_StartGame_Should_Sync_Valid_Board_With_One_Bomb(t *testing.T) {
 	rows := 2
 	columns := 2
-	bombs := 1 // TODO: Support this
+	bombs := 1
 
 	g := game.Fake{
 		IsStartedFunc: func() bool {
@@ -96,7 +93,11 @@ func Test_StartGame_Should_Sync_Valid_Board_With_Game_Original_Implementation(t 
 		},
 	}
 
-	assert.NoError(t, StartGame{}.StartGame(g, rows, columns, bombs))
+	sg := StartGame{
+		Rand: random.NewSequence([]int{0, 0, 1, 1}),
+	}
+
+	assert.NoError(t, sg.StartGame(g, rows, columns, bombs))
 }
 
 func Test_StartGame_Should_Sync_Valid_Board_With_Game(t *testing.T) {
