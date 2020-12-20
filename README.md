@@ -2,7 +2,20 @@
 
 REST implementation of minesweeper
 
+## How to Run Locally
+
+You can run the code locally with `go run cmd/rest/main.go`.
+
+## Configuration
+
+* If the `PORT` env var is set it will use that port, otherwise it will default to `8080`
+* If the `REVEAL_EVERYTHING` env var is set to `true`, every time that the board would be shown in the hidden internal state will be revealed (`X` for bomb and `O` for no bomb. `F` for Flag, `?` for Question Mark, `H` for Hidden and `R` for Revealed). Otherwise, the game would be played like the desktop version. 
+
 ## Existing Resources
+
+The API url is:
+* https://minesweeper-rodroma.herokuapp.com/ for the Heroku Dyno with the last changes in master
+* http://localhost:$PORT/ for the local version
 
 ### Creating a game
 
@@ -50,27 +63,49 @@ It receives a body of the form:
 * `row` and `column` must be withing the board's limits.
 * The Tile at that position must not be revealed already.
 
-In any of those cases a HTTP 400 error with the cause will be returned.
+In any of those cases an HTTP 400 error with the cause will be returned.
 
 It will Tap (left click) that tile, if it was a bomb the game will be considered finished.
 
 It returns a JSON that contains a `result` field that signals if the game is lost or not, and the current state of the game (if the game is lost, every tile will be revealed).
 
+### Mark (right click) a Tile
+
+`POST /game/mark`
+
+It receives a body of the form:
+
+```typescript
+{
+  "row": int,
+  "column": int,
+  "mark": "flag" | "question"
+}
+```
+
+* The game must be already started.
+* `row` and `column` must be withing the board's limits.
+* `mark` should be a valid mark.
+* The Tile at that position must not be revealed already.
+
+In any of those cases an HTTP 400 error with the cause will be returned.
+
+It will Mark (right click) that tile with the given mark
+
+It returns a JSON with the current state of the game.
+
 ## Missing Resources
 
 ### Delete a Game
-
-### Mark (right click) a Tile
 
 ## Missing Features
 
 This code is very WIP, several features are missing:
 
 * Client Library
-* A persistant implementation of Game
+* A persistent implementation of Game
 * Time Tracking
 * Multiple accounts
-* Multiple games
 
 ## Design Decisions
 
@@ -105,3 +140,7 @@ minesweeper ->
 * A Board is a matrix of randomly assigned tiles
 * A Game is a Board handler, used for abstracting over a persistent/volatile store.
 * A Game Holder stores multiple game sessions.
+
+### How to explore through the code
+
+You can first check in `routes.go` for the Handler method that represents that resource (if there are dependencies you can check for them in the `provide` package).

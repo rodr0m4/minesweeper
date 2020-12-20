@@ -1,5 +1,6 @@
 module minesweeper
 
+// +heroku install ./cmd/rest
 // +heroku goVersion go1.15
 go 1.15
 
