@@ -5,8 +5,8 @@ var (
 	ErrCantTapOnFlaggedTile  = NewInvalidOperation("can not tap on flagged tile")
 )
 
-// Tiles have private state because some combination of attributes could make it illegal (revealed + flagged, for
-// example).
+// All the state in a Tile is private because some combination of attributes
+// could make the state illegal (revealed + flagged, for example).
 type Tile struct {
 	hasBomb bool
 	state   TileState

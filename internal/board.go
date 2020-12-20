@@ -19,7 +19,9 @@ type Position struct {
 	Column int
 }
 
-// This constructor does not use randomness, for testing purposes
+// NewBoardFromInitializedMatrix expects a fully initialized matrix instead of
+// generating it using randomness. It is useful for testing and serializing or
+// deserializing.
 func NewBoardFromInitializedMatrix(matrix Matrix) Board {
 	var rows, columns, bombs int
 
@@ -42,6 +44,8 @@ func NewBoardFromInitializedMatrix(matrix Matrix) Board {
 	}
 }
 
+// NewBoard creates a board, first creating the matrix with bombs at random
+// places. It is used when first creating the Board.
 func NewBoard(rand random.Intn, rows, columns, bombs int) Board {
 	matrix := newMatrix(rows, columns)
 
@@ -68,9 +72,17 @@ func (b Board) Find(position Position) *Tile {
 	row := position.Row
 	column := position.Column
 
+	// Manual bounds check so the error message is better than accessing the
+	// matrix with bad indexes
+	if b.isOutOfBounds(row, column) {
+		panic(b.outOfBoundsError(row, column))
+	}
+
 	return b.matrix[row][column]
 }
 
+// Traverse goes through the matrix, top-left to bottom right, first every column
+// then every row.
 func (b Board) Traverse(f func(*Tile, Position)) {
 	traverse(b.rows, b.columns, func(position Position) {
 		tile := b.Find(position)
@@ -78,6 +90,7 @@ func (b Board) Traverse(f func(*Tile, Position)) {
 	})
 }
 
+// Position generates either a valid position for that pair, or an error.
 func (b Board) Position(row, column int) (Position, error) {
 	if b.isOutOfBounds(row, column) {
 		return Position{}, b.outOfBoundsError(row, column)
@@ -86,6 +99,8 @@ func (b Board) Position(row, column int) (Position, error) {
 	return Position{Row: row, Column: column}, nil
 }
 
+// FindAdjacentTo gets every adjacent Position to the given one that are
+// within bounds of the Board.
 func (b Board) FindAdjacentTo(position Position) []Position {
 	row := position.Row
 	column := position.Column
