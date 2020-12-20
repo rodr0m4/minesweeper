@@ -63,7 +63,7 @@ func (t *Tile) Modify(opts ...TileOption) {
 }
 
 func (t *Tile) Tap() (result TapResult, err error) {
-	switch t.state.(type) {
+	switch t.State().(type) {
 	case RevealedTile:
 		err = ErrCantTapOnRevealedTile
 		return
@@ -79,6 +79,17 @@ func (t *Tile) Tap() (result TapResult, err error) {
 	}
 
 	return
+}
+
+func (t *Tile) Mark(mark TileMark) error {
+	switch t.State().(type) {
+	case HiddenTile, MarkedTile:
+		t.Modify(WithMark(mark))
+	case RevealedTile:
+		return NewInvalidOperation("can't mark a revealed tile")
+	}
+
+	return nil
 }
 
 type TapResult int

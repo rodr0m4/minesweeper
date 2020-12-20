@@ -144,5 +144,5 @@ func stringToTileMark(s string) (internal.TileMark, error) {
 		return internal.QuestionMark, nil
 	}
 
-	return 0, internal.NewInvalidOperation(fmt.Sprintf("invalid tile mark %s", s))
+	return 0, internal.NewInvalidOperation(fmt.Sprintf("invalid tile mark '%s'", s))
 }

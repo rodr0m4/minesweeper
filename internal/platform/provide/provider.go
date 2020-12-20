@@ -52,6 +52,6 @@ func ModifyTileHandler(holder game.Holder, boardDrawer operation.BoardDrawer) *r
 			GameFinisher: operation.FinishGame{},
 			TileRevealer: operation.RevealAdjacent{},
 		},
-		Marker: nil,
+		Marker: operation.Mark{},
 	}
 }
