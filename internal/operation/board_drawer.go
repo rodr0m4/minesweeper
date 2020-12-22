@@ -7,8 +7,8 @@ import (
 )
 
 type ShowedGame struct {
-	Tiles []ShowedTile `json:"tiles"`
-	Lines []string     `json:"lines"`
+	Tiles []ShowedTile `json:"tiles,omitempty"`
+	Lines []string     `json:"lines,omitempty"`
 }
 
 type ShowedTile struct {

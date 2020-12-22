@@ -23,11 +23,11 @@ func GameHolder() game.Holder {
 	return game.NewInMemoryHolder()
 }
 
-func BoardDrawer(revealEverything bool) operation.DefaultBoardDrawer {
+func BoardDrawer(revealEverything bool, showTiles bool, showLines bool) operation.DefaultBoardDrawer {
 	return operation.DefaultBoardDrawer{
 		RevealEverything: revealEverything,
-		ShowTiles:        true,
-		ShowLines:        true,
+		ShowTiles:        showTiles,
+		ShowLines:        showLines,
 	}
 }
 

@@ -24,7 +24,11 @@ func run() error {
 	}
 
 	gameHolder := provide.GameHolder()
-	boardDrawer := provide.BoardDrawer(shouldRevealEverything())
+	boardDrawer := provide.BoardDrawer(
+		parseBooleanEnvVar("REVEAL_EVERYTHING", false),
+		parseBooleanEnvVar("SHOW_TILES", false),
+		parseBooleanEnvVar("SHOW_LINES", true),
+	)
 
 	server := &rest.Server{
 		Engine:            provide.GinEngine(),
@@ -49,5 +53,18 @@ func shouldRevealEverything() bool {
 		return false
 	default:
 		return true
+	}
+}
+
+func parseBooleanEnvVar(name string, defaultValue bool) bool {
+	env := strings.ToLower(os.Getenv(name))
+
+	switch env {
+	case "true":
+		return true
+	case "false":
+		return false
+	default:
+		return defaultValue
 	}
 }

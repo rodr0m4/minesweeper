@@ -9,7 +9,9 @@ You can run the code locally with `go run cmd/rest/main.go`.
 ## Configuration
 
 * If the `PORT` env var is set it will use that port, otherwise it will default to `8080`
-* If the `REVEAL_EVERYTHING` env var is set to `true`, every time that the board would be shown in the hidden internal state will be revealed (`X` for bomb and `O` for no bomb. `F` for Flag, `?` for Question Mark, `H` for Hidden and `R` for Revealed). Otherwise, the game would be played like the desktop version. 
+* If the `REVEAL_EVERYTHING` env var is set to `true`, every time that the board would be shown in the hidden internal state will be revealed (`X` for bomb and `O` for no bomb. `F` for Flag, `?` for Question Mark, `H` for Hidden and `R` for Revealed). Otherwise, the game would be played like the desktop version.
+* If the `SHOW_TILES` env var is set to `true`, every time that the API would show information about a game, it will display the board as a JSON array of Tile entities. It is `false` by default.
+* If the `SHOW_LINES` env var is set to `false` every time that the API would show information about a game, it will display the board as a JSON array of strings that simulate the desktop game. It is `true` by default.
 
 ## Existing Resources
 
