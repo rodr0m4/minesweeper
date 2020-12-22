@@ -6,6 +6,10 @@ REST implementation of minesweeper
 
 You can run the code locally with `go run cmd/rest/main.go`.
 
+## How to browse through the code
+
+You can first check in `routes.go` for the Handler method that represents that resource (if there are dependencies you can check for them in the `provide` package).
+
 ## Configuration
 
 * If the `PORT` env var is set it will use that port, otherwise it will default to `8080`
@@ -40,6 +44,10 @@ In any of those cases a HTTP 400 error with the cause will be returned.
 
 If given a valid payload, a HTTP 201 will be returned with a JSON representing the state of the board.
 
+#### An example
+
+`curl --data '{"rows": 10, "columns": 10, "bombs": 20}' --request POST 'https://minesweeper-rodroma.herokuapp.com/games' | jq .`
+
 ### Querying the state of the game
 
 `GET /game`
@@ -47,6 +55,10 @@ If given a valid payload, a HTTP 201 will be returned with a JSON representing t
 It will return a JSON representing the state of the board.
 
 It will fail if game has not started yet.
+
+#### An example
+
+`curl 'https://minesweeper-rodroma.herokuapp.com/games/0' | jq .`
 
 ### "Tapping" (left click) a Tile
 
@@ -70,6 +82,10 @@ In any of those cases an HTTP 400 error with the cause will be returned.
 It will Tap (left click) that tile, if it was a bomb the game will be considered finished.
 
 It returns a JSON that contains a `result` field that signals if the game is lost or not, and the current state of the game (if the game is lost, every tile will be revealed).
+
+#### An example
+
+`curl --data '{"row": 0, "column": 6}' --request POST 'https://minesweeper-rodroma.herokuapp.com/games/0/tap' | jq .`
 
 ### Mark (right click) a Tile
 
@@ -96,9 +112,15 @@ It will Mark (right click) that tile with the given mark
 
 It returns a JSON with the current state of the game.
 
+#### An example
+
+`curl --data '{"row": 0, "column": 6, "mark": "question"}' --request POST 'http://localhost:8080/games/0/mark' | jq .`
+
 ## Missing Resources
 
-### Delete a Game
+* Delete a Game
+* Sign up
+* Log in
 
 ## Missing Features
 
@@ -109,7 +131,7 @@ This code is very WIP, several features are missing:
 * Time Tracking
 * Multiple accounts
 
-## Design Decisions
+## API Structure
 
 The structure of the API is as follows:
 
@@ -136,13 +158,9 @@ minesweeper ->
     tile.go Tile type
 ```
 
-### Domain
+## The Domain
 
 * A Tile represents a square in the game, it can be hidden, revealed or marked (with a Flag or a Question Mark) and can have a bomb or not.
 * A Board is a matrix of randomly assigned tiles
 * A Game is a Board handler, used for abstracting over a persistent/volatile store.
 * A Game Holder stores multiple game sessions.
-
-### How to explore through the code
-
-You can first check in `routes.go` for the Handler method that represents that resource (if there are dependencies you can check for them in the `provide` package).
