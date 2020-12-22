@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"minesweeper/internal/platform/provide"
 	"minesweeper/internal/platform/rest"
@@ -42,18 +41,6 @@ func run() error {
 	server.RegisterRoutes()
 
 	return server.Engine.Run(":" + port)
-}
-
-func shouldRevealEverything() bool {
-	env := strings.ToLower(os.Getenv("REVEAL_EVERYTHING"))
-	fmt.Printf("env is %s", env)
-
-	switch env {
-	case "", "false":
-		return false
-	default:
-		return true
-	}
 }
 
 func parseBooleanEnvVar(name string, defaultValue bool) bool {
