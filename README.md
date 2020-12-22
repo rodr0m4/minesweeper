@@ -14,8 +14,16 @@ You can first check in `routes.go` for the Handler method that represents that r
 
 * If the `PORT` env var is set it will use that port, otherwise it will default to `8080`
 * If the `REVEAL_EVERYTHING` env var is set to `true`, every time that the board would be shown in the hidden internal state will be revealed (`X` for bomb and `O` for no bomb. `F` for Flag, `?` for Question Mark, `H` for Hidden and `R` for Revealed). Otherwise, the game would be played like the desktop version.
-* If the `SHOW_TILES` env var is set to `true`, every time that the API would show information about a game, it will display the board as a JSON array of Tile entities. It is `false` by default.
-* If the `SHOW_LINES` env var is set to `false` every time that the API would show information about a game, it will display the board as a JSON array of strings that simulate the desktop game. It is `true` by default.
+* If the `SHOW_TILES` env var is set to `true`, every time that the API would show information about a game, it will display the board as a JSON array of Tile entities (optimized for consumption as a REST resource). It is `false` by default.
+* If the `SHOW_LINES` env var is set to `false` every time that the API would show information about a game, it will display the board as a JSON array of strings that simulate the desktop game (optimized for playing directly by making requests to the API). It is `true` by default.
+
+### Why env vars?
+
+`REVEAL_EVERYTING`, `SHOW_TILES` and `SHOW_LINES` are not env vars because I think it is a very good decision, but because it was easier to iterate through the design using them as such. The "best" implementation would have:
+
+* `REVEAL_EVERYTHING` as a permission for a super user .
+* `SHOW_TILES` and `SHOW_LINES` as preferences stored in a persistent store or passed by header.
+
 
 ## Existing Resources
 
